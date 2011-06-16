@@ -38,7 +38,7 @@ install:
 	cp etc/config.php.skel $(DESTDIR)/usr/share/doc/cybsso
 
 	mkdir -p $(DESTDIR)/usr/share/cybsso/www
-	cp www/* $(DESTDIR)/usr/share/cybsso/www
+	cp -r www/* $(DESTDIR)/usr/share/cybsso/www
 
 	mkdir -p $(DESTDIR)/usr/share/cybsso/api
 	cp api/* $(DESTDIR)/usr/share/cybsso/api
