@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Copyright (C) 2010 Cyril Bouthors <cyril@bouthors.org>
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+set -e
+
+if [ "$1" != "configure" ]
+then
+    exit 0
+fi
+
+chown www-data:www-data /etc/cybsso/htpasswd
+chmod 600 /etc/cybsso/htpasswd
+
+if [ ! -e /etc/apache2/conf.d/cybsso.conf ]
+then
+    ln -snf ../../cybsso/apache.conf /etc/apache2/conf.d/cybapi.conf
+
+    # Reload webserver
+
+    # Redirection of 3 is needed because Debconf uses it and it might be
+    # inherited by webserver. See bug #446324.
+
+    /etc/init.d/apache2 reload 3>/dev/null || true
+fi
+
+#DEBHELPER#
+
+exit 0

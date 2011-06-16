@@ -1,0 +1,16 @@
+Source: cybsso
+Section: admin
+Priority: optional
+Maintainer: Cyril Bouthors <cyb@debian.org>
+Uploaders: Cyril Bouthors <cyril@bouthors.org>
+Build-Depends: debhelper (>= 5), phpunit, php5-xdebug
+Standards-Version: 3.9.1
+
+Package: cybsso
+Architecture: all
+Depends: libapache2-mod-php5 | php5-cgi,
+    apache2,
+    php5-mysql,
+    ${misc:Depends}
+Description: API to manage SSO
+ API to handle SSO functions.
