@@ -56,8 +56,12 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 			or die(mysql_error());
 
 		// Create table(s)
-		mysql_query(file_get_contents('schema.sql'))
-			or die(mysql_error());
+		foreach(split(';', file_get_contents('schema.sql')) as $query) {
+			if(preg_match('/^\s+$/', $query))
+				continue;
+			mysql_query($query)
+			   or die(mysql_error());
+		}
 
 		// Close connection
 		mysql_close()
@@ -81,6 +85,16 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 			new ReflectionMethod('CybSSO', '_ValidatePassword');
         $this->_ValidatePassword->setAccessible(TRUE);
 
+		// CybSSO::_ValidateUserAvailable()
+        $this->_ValidateUserAvailable =
+			new ReflectionMethod('CybSSO', '_ValidateUserAvailable');
+        $this->_ValidateUserAvailable->setAccessible(TRUE);
+
+		// CybSSO::_ValidateUserExists()
+        $this->_ValidateUserExists =
+			new ReflectionMethod('CybSSO', '_ValidateUserExists');
+        $this->_ValidateUserExists->setAccessible(TRUE);
+
 		// CybSSO::_TicketCreate()
         $this->_TicketCreate = new ReflectionMethod('CybSSO', '_TicketCreate');
         $this->_TicketCreate->setAccessible(TRUE);
@@ -88,10 +102,25 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		// CybSSO::_UserCreate()
         $this->_UserCreate = new ReflectionMethod('CybSSO', '_UserCreate');
         $this->_UserCreate->setAccessible(TRUE);
+
+		// CybSSO::_PasswordRecovery()
+        $this->_PasswordRecovery =
+			new ReflectionMethod('CybSSO', '_PasswordRecovery');
+        $this->_PasswordRecovery->setAccessible(TRUE);
+
+		// CybSSO::_PasswordRecoveryCheckTicket()
+        $this->_PasswordRecoveryCheckTicket =
+			new ReflectionMethod('CybSSO', '_PasswordRecoveryCheckTicket');
+        $this->_PasswordRecoveryCheckTicket->setAccessible(TRUE);
+
+		// CybSSO::_PasswordReset()
+        $this->_PasswordReset =
+			new ReflectionMethod('CybSSO', '_PasswordReset');
+        $this->_PasswordReset->setAccessible(TRUE);
 	}
 
 	protected function TearDown() {
-		require('../etc/config.php');
+		require('../etc/config-test.php');
 
 		// Connect to the MySQL server
 		mysql_connect($cybsso_sql_config['host'],
@@ -246,6 +275,35 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->_ValidatePassword->invoke($this->CybSSO, 'GoovmJk6C2vDvGoN');
     }
 
+
+    function testValidateUserAvailable() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'my-password',
+		);
+
+		$this->_ValidateUserAvailable->invoke($this->CybSSO, $user['email']);
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->setExpectedException('SoapFault');
+		$this->_ValidateUserAvailable->invoke($this->CybSSO, $user['email']);
+    }
+
+    function testValidateUserExistsOK() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'my-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+		$this->_ValidateUserExists->invoke($this->CybSSO, $user['email']);
+    }
+
+    function testValidateUserExistNoUser() {
+		$this->setExpectedException('SoapFault');
+		$this->_ValidateUserExists->invoke($this->CybSSO, 'user1@company.com');
+	}
+
 	################################################################
 	# Ticket
 
@@ -281,33 +339,35 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 	}
 
 	function testTicketCreateInvalidPassword() {
-		$email    = 'user1@company.com';
-		$password = 'invalid-password';
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'my-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
 		$this->setExpectedException('SoapFault');
-		$this->_TicketCreate->invoke($this->CybSSO, $email, $password);
+		$this->_TicketCreate->invoke($this->CybSSO, $user['email'],
+									 'incorrect-password');
 	}
 
 	function testTicketCreateOK() {
-		global $cybsso_sql_config;
+		$user = array(
+			'email'     => 'user1@company.com',
+			'firstname' => 'John',
+			'lastname'  => 'Doe',
+			'password'  => 'valid-password',
+		);
 
-		$email    = 'user1@company.com';
-		$password = 'valid-password';
+		$this->_UserCreate->invoke($this->CybSSO, $user);
 
-		mysql_connect($cybsso_sql_config['host'],
-					  $cybsso_sql_config['user'],
-					  $cybsso_sql_config['pass'])
-			or die(mysql_error());
+		$ticket = $this->_TicketCreate->invoke($this->CybSSO,
+											   $user['email'],
+											   $user['password']);
 
-		mysql_query('INSERT INTO user SET '.
-					"email  = '$email', " .
-					"crypt_password = SHA1('$password'), " .
-					"firstname = 'firstname', ".
-					"lastname = 'lastname'")
-			or die(mysql_error());
-
-		$ticket = $this->_TicketCreate->invoke($this->CybSSO, $email, $password);
-
-		$this->assertType('string', $ticket);
+		$this->assertType('array', $ticket);
+		$this->assertArrayHasKey('name', $ticket);
+		$this->assertArrayHasKey('expiration', $ticket);
 	}
 
 	################################################################
@@ -319,37 +379,134 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 	}
 
 	function testUserGetInfoOK() {
+		$user = array(
+			'email'     => 'user1@company.com',
+			'firstname' => 'John',
+			'lastname'  => 'Doe',
+			'password'  => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$new_user = $this->CybSSO->UserGetInfo($user['email']);
+
+		$this->assertEquals($user['firstname'], $new_user['firstname']);
+		$this->assertEquals($user['lastname'],  $new_user['lastname']);
+		$this->assertEquals($user['email'],     $new_user['email']);
+	}
+
+	function testUserCreateDuplicated() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+		$this->setExpectedException('SoapFault');
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+	}
+
+	function testUserCreateOK() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+	}
+
+	function testPasswordRecoveryOK() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->_PasswordRecovery->invoke($this->CybSSO, $user['email']);
+	}
+
+	function testPasswordRecoveryCheckTicketUnknownTicket() {
+		$ticket = 'IuRK2RQxkG0H1c7Byxw0Z6oaTvRrETYxbOdqSmYkJmPsrjqrqbo3h6sxvu';
+
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->setExpectedException('SoapFault');
+		$this->_PasswordRecoveryCheckTicket->invoke(
+			$this->CybSSO, $user['email'], $ticket);
+	}
+
+	function testPasswordRecoveryCheckTicketOK() {
 		global $cybsso_sql_config;
-		$email = 'user1@company.com';
-		$firstname = 'John';
-		$lastname = 'Doe';
+		$ticket = 'IuRK2RQxkG0H1c7Byxw0Z6oaTvRrETYxbOdqSmYkJmPsrjqrqbo3h6sxvu';
+
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
 
 		mysql_connect($cybsso_sql_config['host'],
 					  $cybsso_sql_config['user'],
 					  $cybsso_sql_config['pass'])
 			or die(mysql_error());
 
-		mysql_query('INSERT INTO user SET '.
-					"email  = '$email', " .
-					"crypt_password = SHA1('crypt'), " .
-					"firstname = '$firstname', ".
-					"lastname = '$lastname'")
+		$tomorrow = time() + 86400;
+
+		mysql_query('INSERT INTO password_recovery SET '.
+					"ticket = '$ticket', " .
+					"email  = '$user[email]', " .
+					"ticket_expiration_date = $tomorrow")
 			or die(mysql_error());
-
-		$user = $this->CybSSO->UserGetInfo($email);
-
-		$this->assertEquals($firstname, $user['firstname']);
-		$this->assertEquals($lastname,  $user['lastname']);
-		$this->assertEquals($email,     $user['email']);
+		
+		$this->_PasswordRecoveryCheckTicket->invoke(
+			$this->CybSSO, $user['email'], $ticket);
 	}
 
-	function testUserCreateOK() {
+	function testPasswordResetPasswordMismatch() {
 		$user = array(
-			'email' => 'user1@company.com',
-			'password' => 'invalid-password',
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
 		);
 
 		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->setExpectedException('SoapFault');
+		$this->_PasswordReset->invoke(
+			$this->CybSSO, $user['email'], 'password1', 'password2');
+	}
+
+	function testPasswordResetUserDidNotAskReset() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->setExpectedException('SoapFault');
+		$this->_PasswordReset->invoke(
+			$this->CybSSO, $user['email'], 'password', 'password');
+	}
+
+	function testPasswordResetOK() {
+		$user = array(
+			'email'    => 'user1@company.com',
+			'password' => 'valid-password',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user);
+
+		$this->_PasswordRecovery->invoke($this->CybSSO, $user['email']);
+
+		$this->_PasswordReset->invoke(
+			$this->CybSSO, $user['email'], 'password', 'password');
 	}
 }
 ?>

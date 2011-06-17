@@ -28,6 +28,18 @@ class CybSSOPrivate extends CybSSO {
 	function UserCreate(array $user = array()) {
 		return $this->_UserCreate($user);
 	}
+
+	function PasswordRecovery($email = null, $return_url = null) {
+		return $this->_PasswordRecovery($email, $return_url);
+	}
+
+	function PasswordRecoveryCheckTicket($email = null, $ticket = null) {
+		return $this->_PasswordRecoveryCheckTicket($email, $ticket);
+	}
+
+	function PasswordReset($email = null, $password = null, $password2 = null) {
+		return $this->_PasswordReset($email, $password, $password2);
+	}
 }
 
 ?>

@@ -47,6 +47,10 @@
 class CybSSO {
 
 	private $_db = false;
+	private $_ticket_validity = 86400;
+	private $_email_sender_name = 'Go Managed Applications';
+	private $_email_sender_address = 'noreply@go-managed-app.com';
+	private $_url = 'http://cybsso.dev.isvtec.com/';
 
 	################################################################
 	# Validate
@@ -112,6 +116,30 @@ class CybSSO {
 								'Invalid password syntax');
 	}
 
+	private function _ValidateUserAvailable($email = null) {
+		$email = strtolower(mysql_escape_string($email));
+
+		$result = $this->_SQLQuery('SELECT email '.
+								   'FROM user '.
+								   "WHERE email = '$email'");
+
+		if(mysql_num_rows($result) != 0)
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'User already exists');
+	}
+
+	private function _ValidateUserExists($email = null) {
+		$email = strtolower(mysql_escape_string($email));
+
+		$result = $this->_SQLQuery('SELECT email '.
+								   'FROM user '.
+								   "WHERE email = '$email'");
+
+		if(mysql_num_rows($result) != 1)
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'User does not exist');
+	}
+
 	################################################################
 	# MySQL
 
@@ -167,17 +195,17 @@ class CybSSO {
 	 * @param ticket string. The ticket reference.
 	 * @param email string. The user email address.
 	 *
-	 * @return ticket_expiration_date timestamp. Will contain the expiration
-	 * date of the ticket. The method will throw an exception if the ticket is
-	 * invalid.
-	 *
+	 * @return expiration int. The expiration date of the ticket in a UNIX
+	 * timestamp format.
+	 * 
+	 * The method will throw an exception if the ticket is invalid.
 	 */
 	function TicketCheck($ticket = null, $email = null) {
 
 		$this->_ValidateTicket($ticket);
 		$this->_ValidateEmail($email);
 
-		$email  = mysql_escape_string($email);
+		$email  = strtolower(mysql_escape_string($email));
 		$ticket = mysql_escape_string($ticket);
 
 		$now = time();
@@ -197,24 +225,45 @@ class CybSSO {
 							'Invalid ticket');
 	}
 
+	/**
+	 * Create a new ticket
+	 *
+	 * @param $email string. The user email address.
+	 *
+	 * @param password string. The user password.
+	 * 
+	 * @return ticket_info array. An array contaning information about the
+	 * ticket, for example:
+	 *
+	 * $ticket = array(
+	 * 	'name'       => '4b09dc55b89862439d3c1c68e544a98c3962c7a7619051e43df8a',
+	 * 	'expiration' => 1308376031,
+	 * );
+	 * 
+	 * 'ticket' contains the ticket name.
+	 *
+	 * expiration contains the expiration date of the ticket in a UNIX timestamp
+	 * format.
+	 */
 	protected function _TicketCreate($email = null, $password = null) {
 		$this->_ValidateEmail($email);
 		$this->_ValidatePassword($password);
+		$this->_ValidateUserExists($email);
 		
-		$email    = mysql_escape_string($email);
+		$email = strtolower(mysql_escape_string($email));
 
 		# Crypt password
-		$password = sha1(mysql_escape_string($password));
+		$password = sha1($password);
 
 		# Generate random ticket
 		$ticket = sha1(uniqid('', true)) . sha1(uniqid('', true));
 
-		$tomorrow = time() + 86400;
+		$tomorrow = time() + $this->_ticket_validity;
 
 		$result = $this->_SQLQuery(
 			'UPDATE user ' .
 			"SET ticket='$ticket', " .
-			"  ticket_expiration_date = $tomorrow ".
+			"    ticket_expiration_date = $tomorrow ".
 			"WHERE email = '$email' AND " .
 			"  crypt_password = '$password' " .
 			'LIMIT 1');
@@ -223,7 +272,10 @@ class CybSSO {
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
 								'Invalid email or password');
 
-		return $ticket;
+		return array(
+			'name'       => $ticket,
+			'expiration' => $tomorrow,
+		);
 	}
 
 	################################################################
@@ -249,7 +301,7 @@ class CybSSO {
 	 */
 	function UserGetInfo($email = null) {
 		$this->_ValidateEmail($email);
-		$email  = mysql_escape_string($email);
+		$email = strtolower(mysql_escape_string($email));
 
 		$result = $this->_SQLQuery(
 			'SELECT email, language, firstname, lastname '.
@@ -267,13 +319,17 @@ class CybSSO {
 	protected function _UserCreate(array $user = array()) {
 		$this->_ValidateEmail($user['email']);
 		$this->_ValidatePassword($user['password']);
+		$this->_ValidateUserAvailable($user['email']);
 
 		foreach(array('email', 'password', 'language', 'firstname', 'lastname')
 				as $key) {
 			if(!isset($user[$key]))
 				$user[$key] = '';
-			$user[$key]  = mysql_escape_string($user[$key]);
+			$user[$key] = mysql_escape_string($user[$key]);
 		}
+
+		# Lowercase email address
+		$user['email'] = strtolower($user['email']);
 
 		# Crypt password
 		$user['password'] = sha1($user['password']);
@@ -281,21 +337,123 @@ class CybSSO {
 		# Generate random ticket
 		$ticket = sha1(uniqid('', true)) . sha1(uniqid('', true));
 
-		$tomorrow = time() + 86400;
+		$tomorrow = time() + $this->_ticket_validity;
 
 		$result = $this->_SQLQuery(
 			'INSERT INTO user '.
 			"SET email                = '$user[email]', ".
-			"  crypt_password         = '$user[password]', ".
-			"  firstname              = '$user[firstname]', ".
-			"  lastname               = '$user[lastname]', ".
-			"  language               = '$user[language]', ".
-			"  ticket                 = '$ticket', ".
-			"  ticket_expiration_date = $tomorrow");
+			"    crypt_password         = '$user[password]', ".
+			"    firstname              = '$user[firstname]', ".
+			"    lastname               = '$user[lastname]', ".
+			"    language               = '$user[language]', ".
+			"    ticket                 = '$ticket', ".
+			"    ticket_expiration_date = $tomorrow");
 
-		return $ticket;
+		return array(
+			'name'       => $ticket,
+			'expiration' => $tomorrow,
+		);
 	}
 
+   	protected function _PasswordRecovery($email = null, $return_url = null) {
+   		$this->_ValidateEmail($email);
+		$this->_ValidateUserExists($email);
+
+   		# Lowercase email address
+		$email = strtolower(mysql_escape_string($email));
+
+		# Generate random ticket
+		$ticket = sha1(uniqid('', true)) . sha1(uniqid('', true));
+
+		$four_hours = time() + 4*60*60;
+
+		# Delete any previous password recovery ticket if needed
+   		$result = $this->_SQLQuery(
+   			'DELETE FROM password_recovery '.
+   			"WHERE email = '$email' ".
+			'LIMIT 1');
+
+		# Insert a new password recovery ticket
+   		$result = $this->_SQLQuery(
+   			'INSERT INTO password_recovery '.
+   			"SET email = '$email', ".
+			"    ticket = '$ticket', ".
+			"    ticket_expiration_date = $four_hours");
+
+		$link = $this->_url."?email=$email&ticket=$ticket&".
+			"action=Password%20recovery2";
+
+		if(!empty($return_url))
+			$link .= '&return_url=' . urlencode($return_url);
+
+		$subject = 'Password recovery';
+		$body = "<a href=\"$link\">Password recovery</a>";
+		$headers = "From: $this->_email_sender_name ".
+			"<$this->_email_sender_address>";
+
+		# Avoid sending emails when we are running unit tests
+		if(php_sapi_name() != 'cli')
+			mail($email, $subject, $body, $headers);
+
+   	}
+
+   	protected function _PasswordRecoveryCheckTicket($email = null,
+													$ticket = null) {
+
+		$this->_ValidateTicket($ticket);
+		$this->_ValidateEmail($email);
+		$this->_ValidateUserExists($email);
+
+		$email  = strtolower(mysql_escape_string($email));
+		$ticket = mysql_escape_string($ticket);
+
+		$now = time();
+
+		$result = $this->_SQLQuery('SELECT ticket_expiration_date ' .
+								   'FROM password_recovery ' .
+								   "WHERE email = '$email' AND " .
+								   "ticket = '$ticket' AND ".
+								   "ticket_expiration_date > $now");
+
+		if(mysql_num_rows($result) == 1) {
+			$row = mysql_fetch_row($result);
+			return $row[0];
+		}
+
+		throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+							'Invalid ticket');
+	}
+   	protected function _PasswordReset($email = null, $password = null,
+									  $password2 = null) {
+
+		$this->_ValidateEmail($email);
+		$this->_ValidateUserExists($email);
+		$this->_ValidatePassword($password);
+
+		if($password != $password2)
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'Passwords do not match');
+
+		$email  = strtolower(mysql_escape_string($email));
+
+		# Crypt password
+		$password = sha1($password);
+
+		$result = $this->_SQLQuery(
+			'DELETE FROM password_recovery ' .
+			"WHERE email = '$email' " .
+			'LIMIT 1');
+
+		if(mysql_affected_rows() != 1)
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'User did not ask for password reset');
+
+		$result = $this->_SQLQuery(
+			'UPDATE user ' .
+			"SET crypt_password = '$password' ".
+			"WHERE email = '$email' " .
+			'LIMIT 1');
+	}
 }
 
 ?>

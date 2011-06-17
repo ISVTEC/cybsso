@@ -19,7 +19,7 @@
 ?>
 <?
 require('/etc/cybsso/config.php');
-require('../../lib/CybSSO.php');
+require('CybSSO.php');
 
 session_start();
 
@@ -39,42 +39,54 @@ if(isset($_GET['ticket'], $_GET['email'])) {
 		exit;
 	}
 	catch(SoapFault $fault) {
-		echo '<font color="red">'.$fault->getMessage() . '</font>';
+		# Ticket is invalid, go back to the SSO
+		header('Location: /');
+		exit;
 	}
 }
 
 # Check if ticket is defined and still valid
 if(!isset($_SESSION['ticket']) or
    !isset($_SESSION['ticket_expiration_date']) or
-   $_SESSION['ticket_expiration_date'] <= mktime() or
+   $_SESSION['ticket_expiration_date'] <= time() or
    !isset($_SESSION['email'])) {
 
 	header('Location: /');
 	exit;
 }
 
-$cybsso = new CybSSO;
-$user = $cybsso->UserGetInfo($_SESSION['email']);
-print_r($user);exit;
+try{
+	$cybsso = new CybSSO;
+	$user = $cybsso->UserGetInfo($_SESSION['email']);
+}
+catch(SoapFault $fault) {
+	# SSO error, go back to the SSO
+	header('Location: /');
+	exit;
+}
+
 ?>
+
+<html>
+<head>
+<title>Self care</title>
 
 <h3>Self care</h3>
 
 <h3>User information</h3>
 <form method="POST" action="./">
- Firstname: <input type="text" name="firstname" value="<?=isset($_POST['firstname'])?$_POST['firstname']:''?>" /> <br/>
- Lastname:  <input type="text" name="lastname" value="<?=isset($_POST['lastname'])?$_POST['lastname']:''?>" /> <br/>
- Email: <input type="text" name="email" value="<?=isset($_POST['email'])?$_POST['email']:''?>" /> <br/>
- Password: <input type="password" name="password" value="<?=isset($_POST['password'])?$_POST['password']:''?>" /> <br/>
+ Firstname: <input type="text" name="firstname" value="<?=isset($user['firstname'])?$user['firstname']:''?>" /> <br/>
+ Lastname:  <input type="text" name="lastname" value="<?=isset($user['lastname'])?$user['lastname']:''?>" /> <br/>
+ Email: <input type="text" name="email" value="<?=isset($user['email'])?$user['email']:''?>" /> <br/>
 	  Language: 
   <select name="language">
     <option value="fr_FR">French</option>
-    <option value="en_US">English</option>
+    <option value="en_US" <?if(isset($user['language']) and $user['language'] == 'en_US') echo 'selected';?>>English</option>
   </select>
 <br/>
  <input type="hidden" name="return_url" value="<?=$return_url?>" />
- <input type="submit" name='action' value="Create account">
+ <input type="submit" name='action' value="Update">
 </form>
 
 
-<a href="/logout">Log out</a>
+<a href="/?action=logout">Log out</a>
