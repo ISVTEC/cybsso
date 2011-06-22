@@ -88,6 +88,7 @@ try{
 			break;
 
 		case 'Password recovery':
+			$focus = 'password-recovery';
 			$cybsso->PasswordRecovery($_POST['email'], $return_url);
 			$_GET['message'] = 'password sent';
 			$focus = 'none';
