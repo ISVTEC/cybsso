@@ -19,20 +19,21 @@
 ?>
 <?
 require('/etc/cybsso/config.php');
-require('CybSSO.php');
+require('cybsso/CybSSOPrivate.php');
 
 session_start();
 
-# If the user just logged in, then we set the session and redirect
-if(isset($_GET['ticket'], $_GET['email'])) {
+# If the user has just logged in, then we set the session and redirect to ourself
+if(isset($_GET['cybsso_ticket'], $_GET['cybsso_email'])) {
 	try{
 		$cybsso = new CybSSO;
-		$expiration = $cybsso->TicketCheck($_GET['ticket'], $_GET['email']);
+		$expiration = $cybsso->TicketCheck($_GET['cybsso_ticket'],
+										   $_GET['cybsso_email']);
 
 		$_SESSION = array(
-			'ticket'                 => $_GET['ticket'],
+			'ticket'                 => $_GET['cybsso_ticket'],
 			'ticket_expiration_date' => $expiration,
-			'email'                  => $_GET['email'],
+			'user'                   => $cybsso->UserGetInfo($_GET['cybsso_email']),
 		);
 
 		header('Location: ./');
@@ -45,24 +46,27 @@ if(isset($_GET['ticket'], $_GET['email'])) {
 	}
 }
 
-# Check if ticket is defined and still valid
+# Check if ticket is defined and is still valid
 if(!isset($_SESSION['ticket']) or
    !isset($_SESSION['ticket_expiration_date']) or
    $_SESSION['ticket_expiration_date'] <= time() or
-   !isset($_SESSION['email'])) {
+   !isset($_SESSION['user']['email'])) {
 
+	# Redirect to the auth page if ticket is invalid
 	header('Location: /');
 	exit;
 }
 
-try{
-	$cybsso = new CybSSO;
-	$user = $cybsso->UserGetInfo($_SESSION['email']);
-}
-catch(SoapFault $fault) {
-	# SSO error, go back to the SSO
-	header('Location: /');
-	exit;
+# Update user information if needed
+if(isset($_POST['action']) and $_POST['action']=='Update') {
+	try{
+		$cybsso = new CybSSOPrivate;
+		$cybsso->UserUpdate($_POST);
+		$_SESSION['user'] = $cybsso->UserGetInfo($_SESSION['user']['email']);
+	}
+	catch(SoapFault $fault) {
+		echo '<font color="red">'.$fault->getMessage() . '</font>';
+	}
 }
 
 ?>
@@ -75,16 +79,15 @@ catch(SoapFault $fault) {
 
 <h3>User information</h3>
 <form method="POST" action="./">
- Firstname: <input type="text" name="firstname" value="<?=isset($user['firstname'])?$user['firstname']:''?>" /> <br/>
- Lastname:  <input type="text" name="lastname" value="<?=isset($user['lastname'])?$user['lastname']:''?>" /> <br/>
- Email: <input type="text" name="email" value="<?=isset($user['email'])?$user['email']:''?>" /> <br/>
+ Firstname: <input type="text" name="firstname" value="<?=isset($_SESSION['user']['firstname'])?$_SESSION['user']['firstname']:''?>" /> <br/>
+ Lastname:  <input type="text" name="lastname" value="<?=isset($_SESSION['user']['lastname'])?$_SESSION['user']['lastname']:''?>" /> <br/>
+ Email: <input type="text" name="email" value="<?=isset($_SESSION['user']['email'])?$_SESSION['user']['email']:''?>" /> <br/>
 	  Language: 
   <select name="language">
     <option value="fr_FR">French</option>
-    <option value="en_US" <?if(isset($user['language']) and $user['language'] == 'en_US') echo 'selected';?>>English</option>
+    <option value="en_US" <?if(isset($_SESSION['user']['language']) and $_SESSION['user']['language'] == 'en_US') echo 'selected';?>>English</option>
   </select>
 <br/>
- <input type="hidden" name="return_url" value="<?=$return_url?>" />
  <input type="submit" name='action' value="Update">
 </form>
 
