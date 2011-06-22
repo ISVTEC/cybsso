@@ -1,7 +1,7 @@
 <phpunit>
   <filter>
     <blacklist>
-      <directory suffix=".php">/home/cyb/Documents/ISVTEC/admin/cybsso/etc</directory>
+      <directory suffix=".php">/home/cyb/cybsso/etc</directory>
     </blacklist>
   </filter>
 </phpunit>
