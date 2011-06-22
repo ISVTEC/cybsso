@@ -17,7 +17,7 @@
 //
 
 require('/etc/cybsso/config.php');
-require('CybSSOPrivate.php');
+require('cybsso/CybSSOPrivate.php');
 
 # Check return_url
 $return_url='http://';
@@ -57,7 +57,7 @@ if(isset($_SESSION['ticket']) and
    isset($_SESSION['email'])) {
 
 	header('Location: '.$return_url . $url_separator .
-		   "ticket=$_SESSION[ticket]&email=$_SESSION[email]");
+		   "cybsso_ticket=$_SESSION[ticket]&cybsso_email=$_SESSION[email]");
 	exit;
 }
 
@@ -127,7 +127,7 @@ try{
 		);
 
 		header('Location: '.$return_url . $url_separator .
-			   "ticket=$ticket&email=" . strtolower($_POST['email']));
+			   "cybsso_ticket=$ticket[name]&cybsso_email=" . strtolower($_POST['email']));
 		exit;
 	}
 }
@@ -210,8 +210,8 @@ if(isset($_GET['message']))
 <div class="onglet" id="new-password" style="display:none;">
 <h3>Enter new password</h3>
 <form method="POST" action="./">
- <input type="hidden" name="email" value="<?=$_GET['email'];?>" />
- <input type="hidden" name="ticket" value="<?=$_GET['ticket'];?>" />
+ <input type="hidden" name="email" value="<?=isset($_POST['email'])?$_POST['email']:''?>" />
+ <input type="hidden" name="ticket" value="<?=isset($_POST['ticket'])?$_POST['ticket']:''?>" />
  <input type="hidden" name="return_url" value="<?=$return_url?>" />
  Password: <input type="password" name="password" value="<?=isset($_POST['password'])?$_POST['password']:''?>" /> <br/>
  Password (again): <input type="password" name="password2" value="<?=isset($_POST['password2'])?$_POST['password2']:''?>" /> <br/>
