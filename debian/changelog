@@ -1,3 +1,9 @@
+cybsso (1.0-2) unstable; urgency=low
+
+  * Added support for user info update.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Wed, 22 Jun 2011 20:07:37 +0200
+
 cybsso (1.0-1) unstable; urgency=low
 
   * Initial release
