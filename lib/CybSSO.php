@@ -36,8 +36,7 @@
  * 
  * 		// Connect to the SSO API
  * 		$sso_param = array(
- * 			// 'location' => 'https://login.isvtec.com/',
- * 			'location' => 'http://cybsso-api.dev.isvtec.com/',
+ * 			'location' => 'https://login.isvtec.com/api/',
  * 			'login'    => 'api-login',
  * 			'password' => 'api-password',
  * 			'uri'      => '',

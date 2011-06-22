@@ -40,9 +40,6 @@ install:
 	mkdir -p $(DESTDIR)/usr/share/cybsso/www
 	cp -r www/* $(DESTDIR)/usr/share/cybsso/www
 
-	mkdir -p $(DESTDIR)/usr/share/cybsso/api
-	cp api/* $(DESTDIR)/usr/share/cybsso/api
-
 	mkdir -p $(DESTDIR)/usr/share/php/cybsso
 	cp lib/*.php $(DESTDIR)/usr/share/php/cybsso
 
