@@ -16,7 +16,7 @@
 
 DESTDIR=/usr/local
 RSYNC=rsync -avz --del
-url=doc.cybsso.isvtec.com
+url=cybtools.isvtec.com/cybsso
 
 all:
 	doxygen doxygen.conf
@@ -27,8 +27,8 @@ clean:
 	rm -rf html latex
 
 upload: all
-	$(RSYNC) html/ cybapi-dev.isvtec.com:/var/www/$(url)
-	@echo Documentation is up-to-date at http://$(url)/classCybSSO.html
+	$(RSYNC) html/ cybtools.isvtec.com:/var/www/$(url)
+	@echo Documentation is up-to-date at http://$(url)/
 
 install: all
 	mkdir -p $(DESTDIR)/usr/share/doc/cybsso
