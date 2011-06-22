@@ -20,27 +20,68 @@
  * This API handles SSO.
  *
  * \code
- * try {
- * 	$sso_param = array(
- * 		'location' => 'https://my.machine.com/cybsso/',
- * 		'login'    => 'my-login',
- * 		'password' => 'my-password',
- * 		'uri'      => '',
- * 	);
+ * <?php
  * 
- * 	$cybsso = new SoapClient(null, $sso_param);
+ * session_start();
  * 
- * 	// Check auth ticket
- *  $ticket = '0E5Y9qXXn6sARVEKjE5jczLzE9hDYzLDHKL3EQlXxgeTU8cj78AknPoOTewJHhFHh03GHScP8I0BzZx4Sf6bfBQWk1q8mFQaC8Q6R2MbzpBdo65OXuXFfT5SIeCkwjfM';
- *  $email = 'user1@company.com';
- * 	print_r($cybsso->TicketCheck($ticket, $email));
- *
- * 	// Fetch user information
- * 	print_r($cybsso->UserGetInfo('user1@company.com'));
+ * // Check if ticket is defined and is still valid
+ * if(!isset($_SESSION['ticket'],
+ * 		  $_SESSION['ticket_expiration_date'],
+ * 		  $_SESSION['cybsso_user']['email']) or
+ *    $_SESSION['ticket_expiration_date'] <= time()) {
+ * 
+ * 	try{
+ * 		$return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
+ * 			$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+ * 
+ * 		// Connect to the SSO API
+ * 		$sso_param = array(
+ * 			// 'location' => 'https://login.isvtec.com/',
+ * 			'location' => 'http://cybsso-api.dev.isvtec.com/',
+ * 			'login'    => 'api-login',
+ * 			'password' => 'api-password',
+ * 			'uri'      => '',
+ * 			);
+ * 
+ * 		$cybsso = new SoapClient(null, $sso_param);
+ * 
+ * 		// Redirect to the auth page if ticket is invalid and no information is
+ * 		// given
+ * 		if(!isset($_GET['cybsso_ticket'], $_GET['cybsso_email'])) {
+ * 			header('Location: ' . $cybsso->url() . "?return_url=$return_url");
+ * 			exit;
+ * 		}
+ * 
+ * 		// If the user has just logged in, then we set the session and redirect
+ * 		// to ourself
+ * 		$expiration = $cybsso->TicketCheck($_GET['cybsso_ticket'],
+ * 										   $_GET['cybsso_email']);
+ * 
+ * 		$cybsso_user = $cybsso->UserGetInfo($_GET['cybsso_email']);
+ * 
+ * 		$_SESSION = array(
+ * 			'ticket'                 => $_GET['cybsso_ticket'],
+ * 			'ticket_expiration_date' => $expiration,
+ * 			'cybsso_user'            => $cybsso_user,
+ * 			'cybsso_url'             => $cybsso->url(),
+ * 		);
+ * 
+ * 		header("Location: $return_url");
+ * 		exit;
+ * 	}
+ * 	catch(SoapFault $fault) {
+ * 		// Ticket is invalid, go back to the SSO
+ * 		header('Location: ' . $cybsso->url() . "?return_url=$return_url");
+ * 		exit;
+ * 	}
  * }
- * catch(SoapFault $fault) {
- * 	echo $fault;
- * }
+ * 
+ * echo '<pre>';
+ * print_r($_SESSION['cybsso_user']);
+ * 
+ * ?>
+ * <br/>
+ * <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a>
  * \endcode
  */
 
@@ -50,7 +91,13 @@ class CybSSO {
 	private $_ticket_validity = 86400;
 	private $_email_sender_name = 'Go Managed Applications';
 	private $_email_sender_address = 'noreply@go-managed-app.com';
-	private $_url = 'http://cybsso.dev.isvtec.com/';
+	// public $url = 'https://login.isvtec.com/';
+	public $url = 'http://cybsso.dev.isvtec.com/';
+
+	# Ugly SOAP work-around
+	function url() {
+		return $this->url;
+	}
 
 	################################################################
 	# Validate
@@ -341,7 +388,7 @@ class CybSSO {
 
 		$result = $this->_SQLQuery(
 			'INSERT INTO user '.
-			"SET email                = '$user[email]', ".
+			"SET email                  = '$user[email]', ".
 			"    crypt_password         = '$user[password]', ".
 			"    firstname              = '$user[firstname]', ".
 			"    lastname               = '$user[lastname]', ".
@@ -353,6 +400,29 @@ class CybSSO {
 			'name'       => $ticket,
 			'expiration' => $tomorrow,
 		);
+	}
+
+	protected function _UserUpdate(array $user = array()) {
+		$this->_ValidateEmail($user['email']);
+		$this->_ValidateUserExists($user['email']);
+
+		foreach(array('email', 'language', 'firstname', 'lastname') as $key) {
+			if(!isset($user[$key]))
+				$user[$key] = '';
+			$user[$key] = mysql_escape_string($user[$key]);
+		}
+
+		# Lowercase email address
+		$user['email'] = strtolower($user['email']);
+
+		$result = $this->_SQLQuery(
+   			'UPDATE user '.
+   			'SET ' .
+			"    firstname = '$user[firstname]', ".
+			"    lastname  = '$user[lastname]', ".
+			"    language  = '$user[language]' ".
+			"WHERE   email = '$user[email]' " .
+			'LIMIT 1');
 	}
 
    	protected function _PasswordRecovery($email = null, $return_url = null) {
@@ -380,7 +450,7 @@ class CybSSO {
 			"    ticket = '$ticket', ".
 			"    ticket_expiration_date = $four_hours");
 
-		$link = $this->_url."?email=$email&ticket=$ticket&".
+		$link = $this->url."?email=$email&ticket=$ticket&".
 			"action=Password%20recovery2";
 
 		if(!empty($return_url))
