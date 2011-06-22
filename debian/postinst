@@ -25,18 +25,6 @@ fi
 chown www-data:www-data /etc/cybsso/htpasswd
 chmod 600 /etc/cybsso/htpasswd
 
-if [ ! -e /etc/apache2/conf.d/cybsso.conf ]
-then
-    ln -snf ../../cybsso/apache.conf /etc/apache2/conf.d/cybapi.conf
-
-    # Reload webserver
-
-    # Redirection of 3 is needed because Debconf uses it and it might be
-    # inherited by webserver. See bug #446324.
-
-    /etc/init.d/apache2 reload 3>/dev/null || true
-fi
-
 #DEBHELPER#
 
 exit 0

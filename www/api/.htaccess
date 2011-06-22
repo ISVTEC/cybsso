@@ -1,0 +1,8 @@
+AuthUserFile /etc/cybsso/htpasswd
+AuthGroupFile /dev/null
+AuthName "CybSSO"
+AuthType Basic
+
+<Limit GET POST>
+    require valid-user
+</Limit>

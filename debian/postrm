@@ -17,19 +17,9 @@
 
 set -e
 
-if [ "$1" = "remove" ] || [ "$1" = "purge" ]
+if [ "$1" = "purge" ]
 then
-    rm -f /etc/apache2/conf.d/cybsso.conf
-
-    # Reload webserver in any case, configuration might have changed Redirection
-    # of 3 is needed because Debconf uses it and it might be inherited by
-    # webserver. See bug #446324.
-    /etc/init.d/apache2 reload 3>/dev/null || true
-
-    if [ "$1" = "purge" ]
-    then
-	rm -rf /etc/cybsso /var/lib/cybapi
-    fi
+    rm -rf /etc/cybsso
 fi
 
 #DEBHELPER#

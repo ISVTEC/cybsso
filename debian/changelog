@@ -1,3 +1,9 @@
+cybsso (1.0-3) unstable; urgency=low
+
+  * Use only one URL for API and web.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Wed, 22 Jun 2011 20:18:08 +0200
+
 cybsso (1.0-2) unstable; urgency=low
 
   * Added support for user info update.
