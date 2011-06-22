@@ -81,7 +81,8 @@
  * 
  * ?>
  * <br/>
- * <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a>
+ * <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a> <br/>
+ * <a href="<?=$_SESSION['cybsso_url']?>/self/">Self care</a>
  * \endcode
  */
 
