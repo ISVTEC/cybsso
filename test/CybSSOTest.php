@@ -103,6 +103,10 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
         $this->_UserCreate = new ReflectionMethod('CybSSO', '_UserCreate');
         $this->_UserCreate->setAccessible(TRUE);
 
+		// CybSSO::_UserUpdate()
+        $this->_UserUpdate = new ReflectionMethod('CybSSO', '_UserUpdate');
+        $this->_UserUpdate->setAccessible(TRUE);
+
 		// CybSSO::_PasswordRecovery()
         $this->_PasswordRecovery =
 			new ReflectionMethod('CybSSO', '_PasswordRecovery');
@@ -415,6 +419,40 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->_UserCreate->invoke($this->CybSSO, $user);
 	}
 
+	function testUserUpdateOK() {
+		$user_create = array(
+			'email'     => 'user2@company.com',
+			'password'  => 'valid-password',
+			'firstname' => 'initial firstname',
+			'lastname'  => 'initial lastname',
+			'language'  => 'en_US',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user_create);
+
+		$user = $this->CybSSO->UserGetInfo($user_create['email']);
+
+		$this->assertEquals($user_create['firstname'], $user['firstname']);
+		$this->assertEquals($user_create['lastname'],  $user['lastname']);
+		$this->assertEquals($user_create['email'],     $user['email']);
+		$this->assertEquals($user_create['language'],  $user['language']);
+
+		$user_update = array(
+			'email'     => 'user2@company.com',
+			'firstname' => 'new first name',
+			'lastname'  => 'new last name',
+			'language'  => 'fr_FR',
+		);
+		$this->_UserUpdate->invoke($this->CybSSO, $user_update);
+
+		$user = $this->CybSSO->UserGetInfo($user_create['email']);
+
+		$this->assertEquals($user_update['firstname'], $user['firstname']);
+		$this->assertEquals($user_update['lastname'],  $user['lastname']);
+		$this->assertEquals($user_update['email'],     $user['email']);
+		$this->assertEquals($user_update['language'],  $user['language']);
+	}
+
 	function testPasswordRecoveryOK() {
 		$user = array(
 			'email'    => 'user1@company.com',
@@ -507,6 +545,10 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 
 		$this->_PasswordReset->invoke(
 			$this->CybSSO, $user['email'], 'password', 'password');
+	}
+
+	function testUrl() {
+		$this->CybSSO->url();
 	}
 }
 ?>
