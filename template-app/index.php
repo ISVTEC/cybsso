@@ -14,8 +14,7 @@ if(!isset($_SESSION['ticket'],
 
 		# Connect to the SSO API
 		$sso_param = array(
-			// 'location' => 'https://login.isvtec.com/',
-			'location' => 'http://cybsso-api.dev.isvtec.com/',
+			'location' => 'https://login.isvtec.com/api/',
 			'login'    => 'api-login',
 			'password' => 'api-password',
 			'uri'      => '',
@@ -52,12 +51,14 @@ if(!isset($_SESSION['ticket'],
 		header('Location: ' . $cybsso->url() . "?return_url=$return_url");
 		exit;
 	}
+
+	unset($return_url);
 }
 
 echo '<pre>';
 print_r($_SESSION['cybsso_user']);
-
 ?>
+</pre>
 <br/>
 <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a> <br/>
 <a href="<?=$_SESSION['cybsso_url']?>/self/">Self care</a>
