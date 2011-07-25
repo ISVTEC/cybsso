@@ -18,8 +18,14 @@ DESTDIR=/usr/local
 RSYNC=rsync -avz --del
 url=cybtools.isvtec.com/cybsso
 
-all:
+ALL= html/index.html latex/refman.pdf
+
+all: $(ALL);
+
+html/index.html: ../lib/CybSSO.php
 	doxygen doxygen.conf
+
+latex/refman.pdf: html/index.html
 	$(MAKE) -C latex
 	@echo Documentation is here: file://$$PWD/html/index.html
 
