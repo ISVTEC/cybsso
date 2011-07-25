@@ -1,3 +1,11 @@
+cybsso (1.0-4) unstable; urgency=low
+
+   * Better install instruction
+   * Only build documentation when needed
+   * Cosmetic things
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Mon, 25 Jul 2011 16:20:37 +0200
+
 cybsso (1.0-3) unstable; urgency=low
 
   * Use only one URL for API and web.
