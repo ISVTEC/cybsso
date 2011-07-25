@@ -31,11 +31,10 @@ clean:
 
 install:
 	mkdir -p $(DESTDIR)/etc/cybsso
-	cp etc/apache.conf etc/htpasswd $(DESTDIR)/etc/cybsso
+	cp etc/htpasswd $(DESTDIR)/etc/cybsso
 	chmod 600 $(DESTDIR)/etc/cybsso/htpasswd
 
-	mkdir -p $(DESTDIR)/usr/share/doc/cybsso
-	cp etc/config.php.skel $(DESTDIR)/usr/share/doc/cybsso
+	cp etc/config.php.skel $(DESTDIR)/etc/cybsso/config.php
 
 	mkdir -p $(DESTDIR)/usr/share/cybsso/www
 	cp -r www/* $(DESTDIR)/usr/share/cybsso/www
