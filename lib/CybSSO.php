@@ -73,12 +73,14 @@
  * 		header('Location: ' . $cybsso->url() . "?return_url=$return_url");
  * 		exit;
  * 	}
+ *
+ *	unset($return_url);
  * }
  * 
  * echo '<pre>';
  * print_r($_SESSION['cybsso_user']);
- * 
  * ?>
+ * </pre>
  * <br/>
  * <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a> <br/>
  * <a href="<?=$_SESSION['cybsso_url']?>/self/">Self care</a>
@@ -91,8 +93,7 @@ class CybSSO {
 	private $_ticket_validity = 86400;
 	private $_email_sender_name = 'Go Managed Applications';
 	private $_email_sender_address = 'noreply@go-managed-app.com';
-	// public $url = 'https://login.isvtec.com/';
-	public $url = 'http://cybsso.dev.isvtec.com/';
+	public $url = 'https://login.isvtec.com/';
 
 	# Ugly SOAP work-around
 	function url() {
@@ -358,7 +359,7 @@ class CybSSO {
 
 		if(mysql_num_rows($result) != 1)
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Unknown user');
+								sprintf('Unknown user %s', $email));
 
 		return mysql_fetch_assoc($result);
 	}
