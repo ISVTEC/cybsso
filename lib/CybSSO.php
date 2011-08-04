@@ -87,6 +87,8 @@
  * \endcode
  */
 
+require_once 'CybPHP/Validate.php';
+
 class CybSSO {
 
 	private $_db = false;
@@ -103,65 +105,14 @@ class CybSSO {
 	################################################################
 	# Validate
 
-	private function _ValidateEmail($email ='') {
-		if(strlen($email) < 3)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Email address is too short');
-
-		if(strlen($email) > 64)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Email address is too long');
-
-		if(!preg_match('/^([\w\-\.]|\*)+@[\w\-]+\.[\w\-]+$/', $email))
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Email address is syntactically incorrect');
-
-		$domain = preg_replace('/.*@/', '', $email);
-		$this->_ValidateDomain($domain);
-	}
-
 	/* If this method requires IDN support or complicated stuff like that, you
 	 * should have a look at /usr/share/php/Zend/Validate/Hostname.php as this
 	 * method was using Zend_Validate_Hostname before
 	 */
-	private function _ValidateDomain($domain) {
-		# Check if $domain is too short
-		if (strlen($domain) < 4)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Domain name is too short');
-
-		# Check if $domain is too long
-		if (strlen($domain) > 128)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Domain name is too long');
-
-		# Check if $domain is syntactically correct
-		if(!preg_match('/^[\w\-]+\.[\w\-\.]+$/', $domain))
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Invalid domain syntax');
-	}
-
 	private function _ValidateTicket($ticket ='') {
 		if(!preg_match('/^[a-zA-Z0-9]{50,128}$/', $ticket))
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
 								'Ticket name is syntactically incorrect');
-	}
-
-	private function _ValidatePassword($password) {
-		# Check if $password is too short
-		if (strlen($password) < 6)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Password is too short');
-
-		# Check if $password is too long
-		if (strlen($password) > 32)
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Password is too long');
-
-		# Check if $password is syntactically correct
-		if(!preg_match('/^[a-zA-Z0-9\_\-]+$/', $password))
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								'Invalid password syntax');
 	}
 
 	private function _ValidateUserAvailable($email = null) {
@@ -251,7 +202,7 @@ class CybSSO {
 	function TicketCheck($ticket = null, $email = null) {
 
 		$this->_ValidateTicket($ticket);
-		$this->_ValidateEmail($email);
+		CybPHP_Validate::ValidateEmail($email);
 
 		$email  = strtolower(mysql_escape_string($email));
 		$ticket = mysql_escape_string($ticket);
@@ -294,8 +245,8 @@ class CybSSO {
 	 * format.
 	 */
 	protected function _TicketCreate($email = null, $password = null) {
-		$this->_ValidateEmail($email);
-		$this->_ValidatePassword($password);
+		CybPHP_Validate::ValidateEmail($email);
+		CybPHP_Validate::ValidatePassword($password);
 		$this->_ValidateUserExists($email);
 		
 		$email = strtolower(mysql_escape_string($email));
@@ -348,7 +299,7 @@ class CybSSO {
 	 *
 	 */
 	function UserGetInfo($email = null) {
-		$this->_ValidateEmail($email);
+		CybPHP_Validate::ValidateEmail($email);
 		$email = strtolower(mysql_escape_string($email));
 
 		$result = $this->_SQLQuery(
@@ -365,8 +316,8 @@ class CybSSO {
 	}
 
 	protected function _UserCreate(array $user = array()) {
-		$this->_ValidateEmail($user['email']);
-		$this->_ValidatePassword($user['password']);
+		CybPHP_Validate::ValidateEmail($user['email']);
+		CybPHP_Validate::ValidatePassword($user['password']);
 		$this->_ValidateUserAvailable($user['email']);
 
 		foreach(array('email', 'password', 'language', 'firstname', 'lastname')
@@ -404,7 +355,7 @@ class CybSSO {
 	}
 
 	protected function _UserUpdate(array $user = array()) {
-		$this->_ValidateEmail($user['email']);
+		CybPHP_Validate::ValidateEmail($user['email']);
 		$this->_ValidateUserExists($user['email']);
 
 		foreach(array('email', 'language', 'firstname', 'lastname') as $key) {
@@ -427,7 +378,7 @@ class CybSSO {
 	}
 
    	protected function _PasswordRecovery($email = null, $return_url = null) {
-   		$this->_ValidateEmail($email);
+   		CybPHP_Validate::ValidateEmail($email);
 		$this->_ValidateUserExists($email);
 
    		# Lowercase email address
@@ -472,7 +423,7 @@ class CybSSO {
 													$ticket = null) {
 
 		$this->_ValidateTicket($ticket);
-		$this->_ValidateEmail($email);
+		CybPHP_Validate::ValidateEmail($email);
 		$this->_ValidateUserExists($email);
 
 		$email  = strtolower(mysql_escape_string($email));
@@ -497,9 +448,9 @@ class CybSSO {
    	protected function _PasswordReset($email = null, $password = null,
 									  $password2 = null) {
 
-		$this->_ValidateEmail($email);
+		CybPHP_Validate::ValidateEmail($email);
 		$this->_ValidateUserExists($email);
-		$this->_ValidatePassword($password);
+		CybPHP_Validate::ValidatePassword($password);
 
 		if($password != $password2)
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',

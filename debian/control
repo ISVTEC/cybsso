@@ -11,6 +11,7 @@ Architecture: all
 Depends: libapache2-mod-php5 | php5-cgi,
     apache2,
     php5-mysql,
+    cybphp,
     ${misc:Depends}
 Description: API to manage SSO
  API to handle SSO functions.

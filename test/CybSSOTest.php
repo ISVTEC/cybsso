@@ -67,23 +67,9 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		mysql_close()
 			or die(mysql_error());
 
-		// CybSSO::_ValidateEmail()
-        $this->_ValidateEmail = new ReflectionMethod('CybSSO', '_ValidateEmail');
-        $this->_ValidateEmail->setAccessible(TRUE);
-
-		// CybSSO::_ValidateDomain()
-        $this->_ValidateDomain =
-			new ReflectionMethod('CybSSO', '_ValidateDomain');
-        $this->_ValidateDomain->setAccessible(TRUE);
-
 		// CybSSO::_ValidateTicket()
         $this->_ValidateTicket = new ReflectionMethod('CybSSO', '_ValidateTicket');
         $this->_ValidateTicket->setAccessible(TRUE);
-
-		// CybSSO::_ValidatePassword()
-        $this->_ValidatePassword =
-			new ReflectionMethod('CybSSO', '_ValidatePassword');
-        $this->_ValidatePassword->setAccessible(TRUE);
 
 		// CybSSO::_ValidateUserAvailable()
         $this->_ValidateUserAvailable =
@@ -177,64 +163,6 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 	################################################################
 	# Validators
 
-	function testValidateEmailWithoutDomain() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateEmail->invoke($this->CybSSO, 'foo-domain.com');
-	}
-
-    function testValidateEmailWithMultipleDomains() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateEmail->invoke($this->CybSSO, 'foo@foo@foo.com');
-	}
-
-    function testValidateEmailInvalidSyntax() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateEmail->invoke($this->CybSSO, "/3//1//''''@domain.com");
-	}
-
-    function testValidateEmailTooShort() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateEmail->invoke($this->CybSSO, 'a');
-	}
-
-    function testValidateEmailTooLong() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateEmail->invoke($this->CybSSO,
-									  'very-long-email-very-long-email-'.
-									  'very-long-email-very-long@email.com');
-    }
-
-    function testValidateEmailOK() {
-		$this->_ValidateEmail->invoke($this->CybSSO, 'foo@domain.com');
-		$this->_ValidateEmail->invoke($this->CybSSO, 'foo-bar@do-main.com');
-    }
-
-    function testValidateDomainInvalidSyntax() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateDomain->invoke($this->CybSSO, 'invalid syntax.com');
-    }
-
-    function testValidateDomainTooShort() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateDomain->invoke($this->CybSSO, 'x');
-    }
-
-    function testValidateDomainTooLong() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidateDomain->invoke($this->CybSSO,
-									   'very-extremely-very-very-very-very-'.
-									   'very-very-very-very-very-very-abusive-'.
-									   'very-very-very-very-very-very-very-'.
-									   'very-very-very-very-very-very-very-'.
-									   'very-very-very-very-very-very-very-'.
-									   'very-very-very-very-very-very-very-'.
-									   'long-hostname');
-    }
-
-    function testValidateDomainOK() {
-		$this->_ValidateDomain->invoke($this->CybSSO, 'google.com');
-    }
-
 	function testValidateTickeInvalid() {
         $this->setExpectedException('SoapFault');
 		$this->_ValidateTicket->invoke($this->CybSSO, 'too-short');
@@ -258,27 +186,6 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$email = 'user1@company.com';
 		$this->_ValidateTicket->invoke($this->CybSSO, $ticket);
 	}
-
-    function testValidatePasswordAlnum() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidatePassword->invoke($this->CybSSO, '!*(!$)(!');
-    }
-
-    function testValidatePasswordTooShort() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidatePassword->invoke($this->CybSSO, 'Goovm');
-    }
-
-    function testValidatePasswordTooLong() {
-        $this->setExpectedException('SoapFault');
-		$this->_ValidatePassword->invoke($this->CybSSO,
-										 'ThisPassWordIsExtremelyReallyTooLong');
-    }
-
-    function testValidatePasswordOK() {
-		$this->_ValidatePassword->invoke($this->CybSSO, 'GoovmJk6C2vDvGoN');
-    }
-
 
     function testValidateUserAvailable() {
 		$user = array(
