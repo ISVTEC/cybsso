@@ -95,6 +95,7 @@ class CybSSO {
 	private $_ticket_validity = 86400;
 	private $_email_sender_name = 'Go Managed Applications';
 	private $_email_sender_address = 'noreply@go-managed-app.com';
+
 	public $url = 'https://login.isvtec.com/';
 
 	# Ugly SOAP work-around
@@ -277,6 +278,23 @@ class CybSSO {
 		);
 	}
 
+	
+	/**
+	 * Delete new ticket
+	 *
+	 * @param $email string. The user email address.
+	 */
+	protected function _TicketDelete($email = null) {
+		CybPHP_Validate::ValidateEmail($email);
+		$email = strtolower(mysql_escape_string($email));
+
+		$this->_SQLQuery(
+			'UPDATE user '.
+			'SET ticket_expiration_date = 0 '.
+			"WHERE email='$email' " .
+			'LIMIT 1');
+	}
+
 	################################################################
 	# User
 
@@ -305,7 +323,7 @@ class CybSSO {
 		$result = $this->_SQLQuery(
 			'SELECT email, language, firstname, lastname '.
 			'FROM user '.
-			"WHERE email='$email' " .
+			"WHERE email = '$email' " .
 			'LIMIT 1');
 
 		if(mysql_num_rows($result) != 1)

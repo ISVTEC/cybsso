@@ -1,6 +1,15 @@
+cybsso (1.0-6) unstable; urgency=low
+
+  * Added TicketDelete method.
+  * Fixed security issue when logout.
+  * Pass unit tests with error_reporting = E_ALL | E_STRICT
+  * Much easier to read code
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Tue, 30 Aug 2011 22:22:18 +0200
+
 cybsso (1.0-5) unstable; urgency=low
 
-  * Added dep to cybphp, removed validators.
+  * Added dep to cybphp, removed local validators.
 
  -- Cyril Bouthors <cyril@bouthors.org>  Wed, 03 Aug 2011 21:34:40 +0200
 

@@ -43,27 +43,6 @@ if(strpos($return_url, '?') == true)
 
 session_start();
 
-# Log out if needed
-if(isset($_GET['action']) and $_GET['action'] == 'logout') {
-	$_SESSION = array();
-	header('Location: ./?message=logout');
-	exit;
-}
-
-# Go straight to $return_url if a valid ticket has been found in the session
-if(isset($_SESSION['ticket']) and
-   isset($_SESSION['ticket_expiration_date']) and
-   $_SESSION['ticket_expiration_date'] > time() and
-   isset($_SESSION['email'])) {
-
-	header('Location: '.$return_url . $url_separator .
-		   "cybsso_ticket=$_SESSION[ticket]&cybsso_email=$_SESSION[email]");
-	exit;
-}
-
-# Default focus
-$focus = 'log-in';
-
 # Process action
 $action = 'none';
 if(isset($_GET['action']))
@@ -72,10 +51,47 @@ if(isset($_GET['action']))
 if(isset($_POST['action']))
 	$action = $_POST['action'];
 
+# Go straight to $return_url if a valid ticket has been found in the session
+if(isset($_SESSION['ticket']) and
+   isset($_SESSION['ticket_expiration_date']) and
+   $_SESSION['ticket_expiration_date'] > time() and
+   isset($_SESSION['user']['email']) and $action != 'logout') {
+
+	header('Location: '.$return_url . $url_separator .
+		   "cybsso_ticket=$_SESSION[ticket]&cybsso_email=".
+		   $_SESSION['user']['email']);
+	exit;
+}
+
+# Default focus
+$focus = 'log-in';
+
 try{
 	$cybsso = new CybSSOPrivate;
 
 	switch($action) {
+
+		case 'logout':
+			# Delete SSO ticket
+			if(isset($_SESSION['user']['email']))
+				$cybsso->TicketDelete($_SESSION['user']['email']);
+
+			# Delete cookie
+			$_SESSION = array();
+			if (ini_get('session.use_cookies')) {
+				$params = session_get_cookie_params();
+				setcookie(session_name(), '', time() - 42000, $params['path'],
+						  $params['domain'], $params['secure'],
+						  $params['httponly']);
+			}
+
+			# Destroy session
+			session_destroy();
+
+			# Redirect and show a message
+			header("Location: ./?message=logout&return_url=$return_url");
+			exit;
+			break;
 
 		case 'Log in':
 			$focus = 'log-in';
@@ -124,7 +140,7 @@ try{
 		$_SESSION = array(
 			'ticket'                 => $ticket['name'],
 			'ticket_expiration_date' => $ticket['expiration'],
-			'email'                  => strtolower($_POST['email']),
+			'user'                   => $cybsso->UserGetInfo(strtolower($_POST['email']))
 		);
 
 		header('Location: '.$return_url . $url_separator .
@@ -156,8 +172,9 @@ catch(SoapFault $fault) {
 <body>
 <?
 $messages = array(
-	'logout' => _('You are now successfully logged out'),
-	'password sent' => _('Successfully sent password recovery instructions by email, please check'),
+	'logout'            => _('You are now successfully logged out'),
+	'password sent'     => _('Successfully sent password recovery '.
+							 'instructions by email, please check'),
 	'password modified' => _('Password successfully modified'),
 );
 

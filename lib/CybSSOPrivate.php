@@ -16,13 +16,17 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-require('CybSSO.php');
+require_once('CybSSO.php');
 
+# Export protected functions as public function
 class CybSSOPrivate extends CybSSO {
 
-	# Export protected function as public function
 	function TicketCreate($email = null, $password = null) {
 		return $this->_TicketCreate($email, $password);
+	}
+
+	function TicketDelete($email = null) {
+		return $this->_TicketDelete($email);
 	}
 
 	function UserCreate(array $user = array()) {

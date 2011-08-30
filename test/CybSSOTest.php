@@ -56,7 +56,7 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 			or die(mysql_error());
 
 		// Create table(s)
-		foreach(split(';', file_get_contents('schema.sql')) as $query) {
+		foreach(explode(';', file_get_contents('schema.sql')) as $query) {
 			if(preg_match('/^\s+$/', $query))
 				continue;
 			mysql_query($query)
@@ -84,6 +84,10 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		// CybSSO::_TicketCreate()
         $this->_TicketCreate = new ReflectionMethod('CybSSO', '_TicketCreate');
         $this->_TicketCreate->setAccessible(TRUE);
+
+		// CybSSO::_TicketDelete()
+        $this->_TicketDelete = new ReflectionMethod('CybSSO', '_TicketDelete');
+        $this->_TicketDelete->setAccessible(TRUE);
 
 		// CybSSO::_UserCreate()
         $this->_UserCreate = new ReflectionMethod('CybSSO', '_UserCreate');
@@ -279,6 +283,12 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->assertType('array', $ticket);
 		$this->assertArrayHasKey('name', $ticket);
 		$this->assertArrayHasKey('expiration', $ticket);
+	}
+
+	function testTicketDeleteOK() {
+		$email = 'user1@company.com';
+
+		$this->_TicketDelete->invoke($this->CybSSO, $email);
 	}
 
 	################################################################
