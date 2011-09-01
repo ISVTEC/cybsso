@@ -14,6 +14,6 @@ confirmation par email lors du signup
 
 renvoyer tous les timestamps en GMT
 
-fonction clef en main cybsso->login()?
+fonction turn-key cybsso->login()?
 
 ajouter un template smarty pour l'envoie de mail dans _PasswordRecovery()

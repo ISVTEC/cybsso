@@ -2,20 +2,18 @@
 
 session_start();
 
-# Connect to the SSO API
-$sso_param = array(
-	'location' => 'https://login.isvtec.com/api/',
-	'login'    => 'api-login',
-	'password' => 'api-password',
-	'uri'      => '',
-);
-
-$cybsso = new SoapClient(null, $sso_param);
-
-$return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
-	$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
 try{
+	# Connect to the SSO API
+	$cybsso = new SoapClient(null, array(
+								 'location' => 'https://login.isvtec.com/api/',
+								 'login'    => 'api-login',
+								 'password' => 'api-password',
+								 'uri'      => '',
+								 ));
+
+	$return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
+		$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
 	# Check if ticket is defined and is still valid
 	if(!isset($_SESSION['cybsso_ticket'],
 			  $_SESSION['cybsso_ticket_expiration_date'],
@@ -49,6 +47,7 @@ try{
 	$_SESSION['cybsso_ticket_expiration_date'] =
 		$cybsso->TicketCheck($_SESSION['cybsso_ticket'],
 							 $_SESSION['cybsso_user']['email']);
+	unset($return_url);
 }
 catch(SoapFault $fault) {
 	# If the ticket is invalid for some reason, then we destroy the session and
@@ -63,8 +62,6 @@ catch(SoapFault $fault) {
 	header('Location: ' . $cybsso->url() . "?return_url=$return_url");
 	exit;
 }
-
-unset($return_url);
 
 echo '<pre>';
 print_r($_SESSION['cybsso_user']);

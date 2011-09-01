@@ -1,3 +1,9 @@
+cybsso (1.0-7) unstable; urgency=low
+
+  * Better logout support.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Thu, 01 Sep 2011 13:54:20 +0200
+
 cybsso (1.0-6) unstable; urgency=low
 
   * Added TicketDelete method.

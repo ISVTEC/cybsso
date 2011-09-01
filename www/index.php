@@ -51,18 +51,6 @@ if(isset($_GET['action']))
 if(isset($_POST['action']))
 	$action = $_POST['action'];
 
-# Go straight to $return_url if a valid ticket has been found in the session
-if(isset($_SESSION['ticket']) and
-   isset($_SESSION['ticket_expiration_date']) and
-   $_SESSION['ticket_expiration_date'] > time() and
-   isset($_SESSION['user']['email']) and $action != 'logout') {
-
-	header('Location: '.$return_url . $url_separator .
-		   "cybsso_ticket=$_SESSION[ticket]&cybsso_email=".
-		   $_SESSION['user']['email']);
-	exit;
-}
-
 # Default focus
 $focus = 'log-in';
 
@@ -91,16 +79,17 @@ try{
 			# Redirect and show a message
 			header("Location: ./?message=logout&return_url=$return_url");
 			exit;
-			break;
 
 		case 'Log in':
 			$focus = 'log-in';
 			$ticket = $cybsso->TicketCreate($_POST['email'], $_POST['password']);
+			$email = $_POST['email'];
 			break;
 
 		case 'Create account':
 			$focus = 'create-account';
 			$ticket = $cybsso->UserCreate($_POST);
+			$email = $_POST['email'];
 			break;
 
 		case 'Password recovery':
@@ -125,31 +114,49 @@ try{
 								   $_POST['password2']);
 
 			$ticket = $cybsso->TicketCreate($_POST['email'], $_POST['password']);
-			break;
-
-		case 'none':
+			$email = $_POST['email'];
 			break;
 
 		default:
-			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
-								"Unknown action $action");
+			# Check ticket if no particular action was requested and a valid
+			# session has been found
+			if(!isset($_SESSION['ticket']) or
+			   !isset($_SESSION['user']['email']))
+				break;
+
+			$cybsso->TicketCheck($_SESSION['ticket'],
+								 $_SESSION['user']['email']);
+
+			$ticket = array('name' => $_SESSION['ticket']);
+			$email = $_SESSION['user']['email'];
 	}
 
 	if(isset($ticket)) {
 
 		$_SESSION = array(
-			'ticket'                 => $ticket['name'],
-			'ticket_expiration_date' => $ticket['expiration'],
-			'user'                   => $cybsso->UserGetInfo(strtolower($_POST['email']))
+			'ticket' => $ticket['name'],
+			'user'   => $cybsso->UserGetInfo($email),
 		);
 
-		header('Location: '.$return_url . $url_separator .
-			   "cybsso_ticket=$ticket[name]&cybsso_email=" . strtolower($_POST['email']));
+		header('Location: '. $return_url . $url_separator .
+			   "cybsso_ticket=$ticket[name]&cybsso_email=$email");
 		exit;
 	}
 }
 catch(SoapFault $fault) {
 	echo '<font color="red">'.$fault->getMessage() . '</font>';
+
+	# Delete cookie
+	$_SESSION = array();
+	if (ini_get('session.use_cookies')) {
+		$params = session_get_cookie_params();
+		setcookie(session_name(), '', time() - 42000, $params['path'],
+				  $params['domain'], $params['secure'],
+				  $params['httponly']);
+	}
+
+	# Destroy session
+	session_destroy();
 }
 
 ?>
