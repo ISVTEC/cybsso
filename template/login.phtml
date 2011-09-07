@@ -1,0 +1,160 @@
+<div id="menu">
+  <ul class="tabs">
+    <li id="signin" class="mine active"><a><span>Connexion</span></a></li>
+    <li id="forgotten" class="mine"><a>Mot de passe</a></li>
+    <li id="account" class="mine"><a>Nouveau compte</a></li>
+  </ul>
+</div>
+<div class="spacer">&nbsp;</div>
+
+%1$s
+
+<div class="span12 columns bloc" style="margin-left:100px;" id="bloc-signin">
+  <h3>Connexion</h3>
+  <p>
+    Ce formulaire vous permet de vous connecter
+  </p>
+  <div class="spacer" style="margin-top:50px;"></div>
+  <form method="post" action="./">
+    <fieldset>
+      <legend>Formulaire</legend>
+      <div class="clearfix">
+	<label for="xlInput">Adresse e-mail</label>
+	<div class="input">
+	  <input class="xlarge"  name="email" size="30" value="%2$s" type="text" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="xlInput">Mot de passe</label>
+	<div class="input">
+	  <input class="xlarge"  name="password" size="30"  value="%3$s" type="password" />
+	</div>
+      </div>
+    </fieldset>
+    <input type="hidden" name="return_url" value="%4$s" /> 
+    <input type="hidden" name='action' value="Log in" />
+
+    <div class="btn-group">
+      <button type="submit" class="btn primary">Send</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </form>
+</div>  
+
+
+<div class="span12 columns bloc" style="display:none;margin-left:100px;" id="bloc-forgotten">
+  <h3>Mot de passe perdu</h3>
+  <p>
+    Ce formulaire vous permet de récupérer votre mot de passe en cas de perte.
+  </p>
+  <div class="spacer" style="margin-top:50px;"></div>
+  <form method="post" action="./">
+    <fieldset>
+      <legend>Formulaire</legend>
+      <div class="clearfix">
+	<label for="xlInput">Adresse email</label>
+	<div class="input">
+	  <input class="xlarge"  name="email" size="30" type="text" value="%2$s" />
+	</div>
+      </div>
+    </fieldset>
+    <input type="hidden" name="return_url" value="%4$s" />
+    <input type="hidden" name='action' value="Password recovery">
+
+    <div  class="btn-group">
+      <button type="submit" class="btn primary">send</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </form>
+</div>  
+
+<!-- is no display -->
+
+<div class="span12 columns bloc" style="display:none;margin-left:100px;" id="bloc-forgotten-change">
+  <h3>Modification de mot de passe</h3>
+  <p>
+    Ce formulaire vous permet de changer le mot de passe.
+  </p>
+  <div class="spacer" style="margin-top:50px;"></div>
+  <form method="post" action="./">
+    <fieldset>
+      <legend>Formulaire</legend>
+      <div class="clearfix">
+	<label for="xlInput">Nouveau mot de passe</label>
+	<div class="input">
+	  <input class="xlarge"  name="password" size="30" type="text" value="%3$s" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="xlInput">Confirmation du mot de passe</label>
+	<div class="input">
+	  <input class="xlarge"  name="password2" size="30" type="text" value="%5$s" />
+	</div>
+      </div>
+    </fieldset>
+    <input type="hidden" name="email" value="%6$s" />
+    <input type="hidden" name="ticket" value="%7$s"  />
+    <input type="hidden" name="return_url" value="%4$s" />
+    <input type="hidden" name='action' value="Password recovery3">
+
+    <div  class="btn-group">
+      <button type="submit" class="btn primary">OK</button>
+      <button type="reset" class="btn">Annuler</button>
+    </div>
+  </form>
+</div>
+<!-- fin --> 
+
+<div class="span12 columns bloc" style="display:none;margin-left:100px;" id="bloc-account">
+  <h3>Création d'un nouveau compte</h3>
+  <p>
+   Ce formulaire vous permet de créer un nouveau compte.
+  </p>
+  <div class="spacer" style="margin-top:50px;"></div>
+  <form method="post" action="./">
+    <fieldset>
+      <legend>Formulaire</legend>
+      <div class="clearfix">
+	<label for="firstname">Prénom</label>
+	<div class="input">
+	  <input class="xlarge" value="%8$s"  name="firstname" size="30" type="text" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="lastname">Nom</label>
+	<div class="input">
+	  <input class="xlarge"  value="%9$s" name="lastname" size="30" type="text" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="email">Adresse email</label>
+	<div class="input">
+	  <input class="xlarge"  name="email" value="%2$s" size="30" type="text" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="password">Mot de passe</label>
+	<div class="input">
+	  <input class="xlarge"  name="password" size="30" type="password" />
+	</div>
+      </div>
+      <div class="clearfix">
+	<label for="language">Langue</label>
+	<div class="input">
+	  <select class="medium" name="language">
+	    <option value="fr_FR">Français</option> 
+	    <option value="en_US">Anglais</option> 
+	  </select>
+	</div>
+      </div>
+
+    </fieldset>
+    <input type="hidden" name="return_url" value="%4$s" />
+    <input type="hidden" name='action' value="Create account"/>
+    
+    <div class="btn-group">
+      <button type="submit" class="btn primary">send</button>
+      <button type="reset" class="btn">Cancel</button>
+    </div>
+  </form>
+</div>

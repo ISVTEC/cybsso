@@ -42,6 +42,9 @@ install:
 	mkdir -p $(DESTDIR)/usr/share/php/cybsso
 	cp lib/*.php $(DESTDIR)/usr/share/php/cybsso
 
+	mkdir -p $(DESTDIR)/usr/share/cybsso/template
+	cp template/*.phtml $(DESTDIR)/usr/share/cybsso/template
+
 	$(MAKE) -C doc install
 
 test:

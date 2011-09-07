@@ -16,8 +16,7 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-?>
-<?
+
 require('/etc/cybsso/config.php');
 require('cybsso/CybSSOPrivate.php');
 
@@ -69,27 +68,32 @@ if(isset($_POST['action']) and $_POST['action']=='Update') {
 	}
 }
 
-?>
+$options = array(
+                 "fr_FR" => "French",
+                 "en_US" => "English",
+                 );
 
-<html>
-<head>
-<title>Self care</title>
+$html = "";
+foreach ($options as $value => $option) {
+    $html .= sprintf("<option value='%s' %s>%s</option>",
+                     $value,
+                     (isset($_SESSION['user']['language']) && $_SESSION['user']['language'] == $value) ?
+                     "selected='selected'" : "",
+                     $option);
+}
 
-<h3>Self care</h3>
+$form = sprintf(
+                file_get_contents('../../template/self.phtml'),
+                isset($_SESSION['user']['firstname'])?$_SESSION['user']['firstname']:'',
+                isset($_SESSION['user']['lastname'])?$_SESSION['user']['lastname']:'',
+                isset($_SESSION['user']['email'])?$_SESSION['user']['email']:'',
+                $html
+                );
 
-<h3>User information</h3>
-<form method="POST" action="./">
- Firstname: <input type="text" name="firstname" value="<?=isset($_SESSION['user']['firstname'])?$_SESSION['user']['firstname']:''?>" /> <br/>
- Lastname:  <input type="text" name="lastname" value="<?=isset($_SESSION['user']['lastname'])?$_SESSION['user']['lastname']:''?>" /> <br/>
- Email: <input type="text" name="email" value="<?=isset($_SESSION['user']['email'])?$_SESSION['user']['email']:''?>" /> <br/>
-	  Language: 
-  <select name="language">
-    <option value="fr_FR">French</option>
-    <option value="en_US" <?if(isset($_SESSION['user']['language']) and $_SESSION['user']['language'] == 'en_US') echo 'selected';?>>English</option>
-  </select>
-<br/>
- <input type="submit" name='action' value="Update">
-</form>
+$page =  sprintf(
+                 str_replace("100%", "100percent", 
+                             file_get_contents('../../template/'.TEMPLATE.'.phtml')),
+                 $form,
+                 "none");
 
-
-<a href="/?action=logout">Log out</a>
+print str_replace("100percent","100%", $page);

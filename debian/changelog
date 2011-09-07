@@ -1,3 +1,9 @@
+cybsso (1.0-8) unstable; urgency=low
+
+  * Added template support.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Wed, 07 Sep 2011 21:51:29 +0200
+
 cybsso (1.0-7) unstable; urgency=low
 
   * Better logout support.

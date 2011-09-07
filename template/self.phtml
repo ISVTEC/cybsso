@@ -1,0 +1,57 @@
+      <!-- debut -->
+      <ul class="pills pillspos">
+	<li class="active">
+	  <a href="/?action=logout">Déconnexion</a>
+	</li>
+      </ul>
+      <div style="margin:50px;margin-top:0px;" class="span12 columns bloc"  id="bloc-signin">
+	<h3>Mon compte</h3>
+	<p>
+	  Cette page vous permet de modifier vos informations personnelles.
+	</p>
+	<div class="spacer" style="margin-top:50px;"></div>
+	<form  method="post" action="./">
+	  <fieldset>
+	    <legend>Fill the form</legend>
+	    <div class="clearfix">
+	      <label for="firstname">Prénom</label>
+	      <div class="input">
+		<input class="xlarge" value="%s"  name="firstname" size="30" type="text" />
+	      </div>
+	    </div>
+	    <div class="clearfix">
+	      <label for="lastname">Bouthors</label>
+	      <div class="input">
+		<input class="xlarge" value="%s"  name="lastname" size="30" type="text" />
+	      </div>
+	    </div>
+	    <div class="clearfix">
+	      <label for="email">Adresse email</label>
+	      <div class="input">
+		<input class="xlarge"  value="%s"  name="email"  size="30" type="text" />
+	      </div>
+	    </div>
+	    <div class="clearfix">
+	      <label for="password">Mot de passe</label>
+	      <div class="input">
+		<input class="xlarge"  name="password" size="30" type="password" />
+	      </div>
+	    </div>
+	    <div class="clearfix">
+	      <label for="language">Langue</label>
+	      <div class="input">
+		<select class="medium" name="language">
+		  %s
+		</select>
+	      </div>
+	    </div>
+	  </fieldset>
+	  <input type="hidden" name='action' value="Update" />
+	  
+	  <div class="btn-group">
+	    <button type="submit" class="btn primary">OK</button>
+	  </div>
+	</form>
+      </div>
+
+      <!-- fin -->
