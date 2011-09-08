@@ -1,3 +1,10 @@
+cybsso (1.0-9) unstable; urgency=low
+
+  * New CSS with fixed "logout button"
+  * Better French translation
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Thu, 08 Sep 2011 18:24:40 +0200
+
 cybsso (1.0-8) unstable; urgency=low
 
   * Added template support.

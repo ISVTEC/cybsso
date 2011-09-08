@@ -304,7 +304,7 @@ a.mainlevelfooter:hover{
     cursor:pointer;
 }
 
-.active {
+.tabs .active {
     border: 1px solid #991418;
     border-bottom: 1px solid white;
     background-color:white !important;
@@ -411,7 +411,8 @@ a.mainlevelfooter:hover{
     color:black !important;
     font-weight:bold;
     text-decoration:none;
-    border:none;
+    border:2px solid white !important;
+    background-color:white !important;
 }
 
 
