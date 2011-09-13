@@ -23,4 +23,7 @@ $cybsso_sql_config = array(
 	'db'   => 'sso',
 );
 
+# define('TEMPLATE', 'go-managed');
+define('TEMPLATE', 'isvtec');
+
 ?>
