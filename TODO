@@ -6,14 +6,12 @@ Gérer return_url dans /self/
 Gérer le fait qu'un user partage une ressource (un serveur) avec une adresse
    email qui n'existe pas encore, lui envoyer un email d'invitation, etc.
 
-fichier de config pour stocker l'URL, etc.
-
 mettre une double demande du mdp lors de la creation de compte (+ check dans l'API)
 
 confirmation par email lors du signup
 
 renvoyer tous les timestamps en GMT
 
-fonction turn-key cybsso->login()?
+fonction turn-key cybsso->login()? voir ~/go_managed/site/lib/class/utils/SSO.php
 
-ajouter un template smarty pour l'envoie de mail dans _PasswordRecovery()
+ajouter un template smarty pour l'envoi de mail dans _PasswordRecovery()

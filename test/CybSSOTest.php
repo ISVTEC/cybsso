@@ -336,6 +336,18 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->_UserCreate->invoke($this->CybSSO, $user);
 	}
 
+	function testUserUpdateFailedLoggedAsDemo() {
+
+		$user_update = array(
+			'email'     => 'demo@isvtec.com',
+			'firstname' => 'new first name',
+			'lastname'  => 'new last name',
+			'language'  => 'fr_FR',
+		);
+		$this->setExpectedException('SoapFault');
+		$this->_UserUpdate->invoke($this->CybSSO, $user_update);
+	}
+
 	function testUserUpdateOK() {
 		$user_create = array(
 			'email'     => 'user2@company.com',
@@ -368,6 +380,11 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($user_update['lastname'],  $user['lastname']);
 		$this->assertEquals($user_update['email'],     $user['email']);
 		$this->assertEquals($user_update['language'],  $user['language']);
+	}
+
+	function testPasswordRecoveryFailedLoggedAsDemo() {
+		$this->setExpectedException('SoapFault');
+		$this->_PasswordRecovery->invoke($this->CybSSO, 'demo@isvtec.com');
 	}
 
 	function testPasswordRecoveryOK() {
@@ -450,6 +467,12 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 			$this->CybSSO, $user['email'], 'password', 'password');
 	}
 
+	function testPasswordResetFailedLoggedAsDemo() {
+		$this->setExpectedException('SoapFault');
+		$this->_PasswordReset->invoke(
+			$this->CybSSO, 'demo@isvtec.com', 'password', 'password');
+	}
+
 	function testPasswordResetOK() {
 		$user = array(
 			'email'    => 'user1@company.com',
@@ -462,10 +485,6 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 
 		$this->_PasswordReset->invoke(
 			$this->CybSSO, $user['email'], 'password', 'password');
-	}
-
-	function testUrl() {
-		$this->CybSSO->url();
 	}
 }
 ?>

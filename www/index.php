@@ -20,9 +20,9 @@ require('/etc/cybsso/config.php');
 require('cybsso/CybSSOPrivate.php');
 
 # Check return_url
-$return_url='http://';
+$return_url = 'http://';
 if($_SERVER['SERVER_PORT'] == 443)
-	$return_url='https://';
+	$return_url = 'https://';
 
 # Default return URL goes to the customer self-care
 $return_url .= $_SERVER['HTTP_HOST'] . '/self/';
@@ -84,8 +84,26 @@ try{
 
 		case 'Log in':
 			$focus = 'log-in';
-			$ticket = $cybsso->TicketCreate($_POST['email'], $_POST['password']);
-			$email = $_POST['email'];
+
+			$email = '';
+			$password = '';
+
+			# Only accept insecure email and password from GET arguments for
+			# demo purpose
+			if(isset($_GET['email']) and $_GET['email'] == 'demo@isvtec.com') {
+				$email = $_GET['email'];
+				if(isset($_GET['password']))
+					$password = $_GET['password'];
+			}
+			else {
+				if(isset($_POST['email']))
+					$email = $_POST['email'];
+
+				if(isset($_POST['password']))
+					$password = $_POST['password'];
+			}
+
+			$ticket = $cybsso->TicketCreate($email, $password);
 			break;
 
 		case 'Create account':
@@ -196,3 +214,4 @@ $page =  sprintf(
                  $focus);
 
 print str_replace("100percent","100%", $page);
+?>

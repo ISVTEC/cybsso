@@ -17,74 +17,7 @@
 //
 
 /**
- * This API handles SSO.
- *
- * \code
- * <?php
- * 
- * session_start();
- * 
- * // Check if ticket is defined and is still valid
- * if(!isset($_SESSION['ticket'],
- * 		  $_SESSION['ticket_expiration_date'],
- * 		  $_SESSION['cybsso_user']['email']) or
- *    $_SESSION['ticket_expiration_date'] <= time()) {
- * 
- * 	try{
- * 		$return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
- * 			$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
- * 
- * 		// Connect to the SSO API
- * 		$sso_param = array(
- * 			'location' => 'https://login.isvtec.com/api/',
- * 			'login'    => 'api-login',
- * 			'password' => 'api-password',
- * 			'uri'      => '',
- * 			);
- * 
- * 		$cybsso = new SoapClient(null, $sso_param);
- * 
- * 		// Redirect to the auth page if ticket is invalid and no information is
- * 		// given
- * 		if(!isset($_GET['cybsso_ticket'], $_GET['cybsso_email'])) {
- * 			header('Location: ' . $cybsso->url() . "?return_url=$return_url");
- * 			exit;
- * 		}
- * 
- * 		// If the user has just logged in, then we set the session and redirect
- * 		// to ourself
- * 		$expiration = $cybsso->TicketCheck($_GET['cybsso_ticket'],
- * 										   $_GET['cybsso_email']);
- * 
- * 		$cybsso_user = $cybsso->UserGetInfo($_GET['cybsso_email']);
- * 
- * 		$_SESSION = array(
- * 			'ticket'                 => $_GET['cybsso_ticket'],
- * 			'ticket_expiration_date' => $expiration,
- * 			'cybsso_user'            => $cybsso_user,
- * 			'cybsso_url'             => $cybsso->url(),
- * 		);
- * 
- * 		header("Location: $return_url");
- * 		exit;
- * 	}
- * 	catch(SoapFault $fault) {
- * 		// Ticket is invalid, go back to the SSO
- * 		header('Location: ' . $cybsso->url() . "?return_url=$return_url");
- * 		exit;
- * 	}
- *
- *	unset($return_url);
- * }
- * 
- * echo '<pre>';
- * print_r($_SESSION['cybsso_user']);
- * ?>
- * </pre>
- * <br/>
- * <a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a> <br/>
- * <a href="<?=$_SESSION['cybsso_url']?>/self/">Self care</a>
- * \endcode
+ * This API handles SSO. Have a look at template-app/ to see an example
  */
 
 require_once 'CybPHP/Validate.php';
@@ -96,12 +29,7 @@ class CybSSO {
 	private $_email_sender_name = 'Go Managed Applications';
 	private $_email_sender_address = 'noreply@go-managed-app.com';
 
-	public $url = 'https://login.isvtec.com/';
-
-	# Ugly SOAP work-around
-	function url() {
-		return $this->url;
-	}
+	private $_url = 'https://login.isvtec.com/';
 
 	################################################################
 	# Validate
@@ -385,6 +313,10 @@ class CybSSO {
 		# Lowercase email address
 		$user['email'] = strtolower($user['email']);
 
+		if($user['email'] == 'demo@isvtec.com')
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'Unable to update demo user information');
+
 		$result = $this->_SQLQuery(
    			'UPDATE user '.
    			'SET ' .
@@ -401,6 +333,10 @@ class CybSSO {
 
    		# Lowercase email address
 		$email = strtolower(mysql_escape_string($email));
+
+		if($email == 'demo@isvtec.com')
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'Unable to update demo user information');
 
 		# Generate random ticket
 		$ticket = sha1(uniqid('', true)) . sha1(uniqid('', true));
@@ -420,7 +356,7 @@ class CybSSO {
 			"    ticket = '$ticket', ".
 			"    ticket_expiration_date = $four_hours");
 
-		$link = $this->url."?email=$email&ticket=$ticket&".
+		$link = $this->_url."?email=$email&ticket=$ticket&".
 			"action=Password%20recovery2";
 
 		if(!empty($return_url))
@@ -474,7 +410,11 @@ class CybSSO {
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
 								'Passwords do not match');
 
-		$email  = strtolower(mysql_escape_string($email));
+		$email = strtolower(mysql_escape_string($email));
+
+		if($email == 'demo@isvtec.com')
+			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
+								'Unable to update demo user information');
 
 		# Crypt password
 		$password = sha1($password);

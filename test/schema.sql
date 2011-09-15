@@ -19,3 +19,10 @@ CREATE TABLE password_recovery (
   PRIMARY KEY (email),
   KEY (ticket)
 ) ENGINE=MyISAM CHARSET=utf8;
+
+INSERT INTO user
+SET email = 'demo@isvtec.com',
+  crypt_password = sha1('demo-isvtec'),
+  language = 'en_US',
+  firstname = 'Demo',
+  lastname = 'ISVTEC';

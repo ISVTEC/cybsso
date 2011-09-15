@@ -4,8 +4,9 @@ session_start();
 
 try{
 	# Connect to the SSO API
+	define('CYBSSO_URL', 'https://login.isvtec.com/');
 	$cybsso = new SoapClient(null, array(
-								 'location' => 'https://login.isvtec.com/api/',
+								 'location' => CYBSSO_URL . 'api/',
 								 'login'    => 'api-login',
 								 'password' => 'api-password',
 								 'uri'      => '',
@@ -36,7 +37,6 @@ try{
 			'cybsso_ticket'                 => $_GET['cybsso_ticket'],
 			'cybsso_ticket_expiration_date' => $expiration,
 			'cybsso_user'                   => $cybsso_user,
-			'cybsso_url'                    => $cybsso->url(),
 		);
 
 		header("Location: $return_url");
@@ -59,7 +59,7 @@ catch(SoapFault $fault) {
 				  $params['domain'], $params['secure'], $params['httponly']);
 	}
 	session_destroy();
-	header('Location: ' . $cybsso->url() . "?return_url=$return_url");
+	header('Location: ' . CYBSSO_URL . "?return_url=$return_url");
 	exit;
 }
 
@@ -68,5 +68,5 @@ print_r($_SESSION['cybsso_user']);
 ?>
 </pre>
 <br/>
-<a href="<?=$_SESSION['cybsso_url']?>?action=logout">Logout</a> <br/>
-<a href="<?=$_SESSION['cybsso_url']?>/self/">Self care</a>
+<a href="<?=CYBSSO_URL?>?action=logout">Logout</a> <br/>
+<a href="<?=CYBSSO_URL?>/self/">Self care</a>

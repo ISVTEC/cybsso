@@ -1,3 +1,12 @@
+cybsso (1.0-10) unstable; urgency=low
+
+  * Removed useless and hard to maintain CybSSO::url()
+  * Added support for automatic login with 'demo@isvtec.com'
+  * Prevent users logged with 'demo@isvtec.com' to update user
+    information, reset password, etc.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Thu, 15 Sep 2011 07:51:31 +0200
+
 cybsso (1.0-9) unstable; urgency=low
 
   * New CSS with fixed "logout button"
