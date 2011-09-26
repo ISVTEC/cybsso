@@ -1,3 +1,9 @@
+cybsso (1.0-11) unstable; urgency=low
+
+  * Auto focus on email HTML input field.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Mon, 26 Sep 2011 07:44:10 +0200
+
 cybsso (1.0-10) unstable; urgency=low
 
   * Removed useless and hard to maintain CybSSO::url()
