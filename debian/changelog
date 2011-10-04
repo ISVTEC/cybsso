@@ -1,3 +1,10 @@
+cybsso (1.0-13) unstable; urgency=low
+
+  * Quick hack to send a nice email for password recovery (no template, no
+    translation, no white branding).
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Tue, 04 Oct 2011 16:42:44 +0200
+
 cybsso (1.0-12) unstable; urgency=low
 
   * Allow multiple users to be connected with the demo user.

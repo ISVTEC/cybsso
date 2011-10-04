@@ -26,8 +26,8 @@ class CybSSO {
 
 	private $_db = false;
 	private $_ticket_validity = 86400;
-	private $_email_sender_name = 'Go Managed Applications';
-	private $_email_sender_address = 'noreply@go-managed-app.com';
+	private $_email_sender_name = 'Exploitation ISVTEC';
+	private $_email_sender_address = 'exploitation@isvtec.com';
 
 	private $_url = 'https://login.isvtec.com/';
 
@@ -371,14 +371,26 @@ class CybSSO {
 		if(!empty($return_url))
 			$link .= '&return_url=' . urlencode($return_url);
 
-		$subject = 'Password recovery';
-		$body = "<a href=\"$link\">Password recovery</a>";
+		$subject = 'Changement mot de passe';
 		$headers = "From: $this->_email_sender_name ".
-			"<$this->_email_sender_address>";
+			"<$this->_email_sender_address>\r\n".
+			"Content-type: text/html; charset=UTF-8\r\n";
+		$body = "Bonjour,<br/><br/>
+
+Vous avez demandé à ce que votre mot de passe soit réinitialisé.<br/><br/>
+
+Veuillez cliquer sur ce lien ci-dessous pour accéder au formulaire&nbsp;:
+<a href=\"$link\">changement de mot de passe</a><br/><br/>
+
+Cordialement<br/>
+-- <br/>
+ISVTEC
+";
 
 		# Avoid sending emails when we are running unit tests
 		if(php_sapi_name() != 'cli')
-			mail($email, $subject, $body, $headers);
+			mail($email, '=?UTF-8?B?'.base64_encode($subject).'?=', $body,
+				 $headers);
 
    	}
 
