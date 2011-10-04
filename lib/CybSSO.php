@@ -389,8 +389,7 @@ ISVTEC
 
 		# Avoid sending emails when we are running unit tests
 		if(php_sapi_name() != 'cli')
-			mail($email, '=?UTF-8?B?'.base64_encode($subject).'?=', $body,
-				 $headers);
+			mail($email, '=?UTF-8?B?'.base64_encode($subject).'?=', $body, $headers);
 
    	}
 
