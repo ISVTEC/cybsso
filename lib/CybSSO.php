@@ -186,6 +186,11 @@ class CybSSO {
 		# Generate random ticket
 		$ticket = sha1(uniqid('', true)) . sha1(uniqid('', true));
 
+		# Hardcode the ticket for demo purpose. This allows several users to be
+		# logged with the same account
+		if($email == 'demo@isvtec.com')
+			$ticket = '41f3fd1866ed9ee32d7e50894fc128ab0a6083bbec1462cc2e58bc59';
+
 		$tomorrow = time() + $this->_ticket_validity;
 
 		$result = $this->_SQLQuery(
@@ -216,6 +221,10 @@ class CybSSO {
 		CybPHP_Validate::ValidateEmail($email);
 		$email = strtolower(mysql_escape_string($email));
 
+		# Avoid demo user to delete the ticket
+		if($email == 'demo@isvtec.com')
+			return;
+		
 		$this->_SQLQuery(
 			'UPDATE user '.
 			'SET ticket_expiration_date = 0 '.

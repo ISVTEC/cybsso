@@ -25,4 +25,4 @@ all: clean
 	@head -76 report/CybSSO.php.html | tail -1 | cut -d\" -f10 | grep -q '100.00%'
 
 clean:
-	rm -rf report
+	@rm -rf report

@@ -1,3 +1,9 @@
+cybsso (1.0-12) unstable; urgency=low
+
+  * Allow multiple users to be connected with the demo user.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Tue, 04 Oct 2011 11:04:04 +0200
+
 cybsso (1.0-11) unstable; urgency=low
 
   * Auto focus on email HTML input field.
