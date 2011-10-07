@@ -68,5 +68,5 @@ print_r($_SESSION['cybsso_user']);
 ?>
 </pre>
 <br/>
-<a href="<?=CYBSSO_URL?>?action=logout">Logout</a> <br/>
+<a href="logout.php">Logout</a> <br/>
 <a href="<?=CYBSSO_URL?>/self/">Self care</a>
