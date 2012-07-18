@@ -57,6 +57,7 @@ if(!isset($_SESSION['ticket']) or
 }
 
 # Update user information if needed
+$message = '';
 if(isset($_POST['action']) and $_POST['action']=='Update') {
 	try{
 		$cybsso = new CybSSOPrivate;
@@ -64,8 +65,15 @@ if(isset($_POST['action']) and $_POST['action']=='Update') {
 		$_SESSION['user'] = $cybsso->UserGetInfo($_SESSION['user']['email']);
 	}
 	catch(SoapFault $fault) {
-		echo '<font color="red">'.$fault->getMessage() . '</font>';
+	  $message = $fault->getMessage();
 	}
+}
+
+if(! empty($message)) {
+  $message = (empty($message) ? $messages[$_GET['message']] : $message);  
+  $message = '<div style="color:black;background-color:#ffced0;border:1px solid red;width:600px;margin-left:50px;padding:10px;margin-bottom:20px;">'
+    . $message
+    . "</div>";
 }
 
 $options = array(
