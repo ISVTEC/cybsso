@@ -133,8 +133,8 @@ class CybSSO {
 		$this->_ValidateTicket($ticket);
 		CybPHP_Validate::ValidateEmail($email);
 
-		$email  = strtolower(mysql_escape_string($email));
-		$ticket = mysql_escape_string($ticket);
+		$email  = strtolower(mysql_real_escape_string($email));
+		$ticket = mysql_real_escape_string($ticket);
 
 		$now = time();
 
@@ -255,7 +255,7 @@ class CybSSO {
 	 */
 	function UserGetInfo($email = null) {
 		CybPHP_Validate::ValidateEmail($email);
-		$email = strtolower(mysql_escape_string($email));
+		$email = strtolower(mysql_real_escape_string($email));
 
 		$result = $this->_SQLQuery(
 			'SELECT email, language, firstname, lastname '.
@@ -279,7 +279,7 @@ class CybSSO {
 				as $key) {
 			if(!isset($user[$key]))
 				$user[$key] = '';
-			$user[$key] = mysql_escape_string($user[$key]);
+			$user[$key] = mysql_real_escape_string($user[$key]);
 		}
 
 		# Lowercase email address
@@ -316,7 +316,7 @@ class CybSSO {
 		foreach(array('email', 'language', 'firstname', 'lastname') as $key) {
 			if(!isset($user[$key]))
 				$user[$key] = '';
-			$user[$key] = mysql_escape_string($user[$key]);
+			$user[$key] = mysql_real_escape_string($user[$key]);
 		}
 
 		# Lowercase email address
@@ -341,7 +341,7 @@ class CybSSO {
 		$this->_ValidateUserExists($email);
 
    		# Lowercase email address
-		$email = strtolower(mysql_escape_string($email));
+		$email = strtolower(mysql_real_escape_string($email));
 
 		if($email == 'demo@isvtec.com')
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
@@ -400,8 +400,8 @@ ISVTEC
 		CybPHP_Validate::ValidateEmail($email);
 		$this->_ValidateUserExists($email);
 
-		$email  = strtolower(mysql_escape_string($email));
-		$ticket = mysql_escape_string($ticket);
+		$email  = strtolower(mysql_real_escape_string($email));
+		$ticket = mysql_real_escape_string($ticket);
 
 		$now = time();
 
@@ -430,7 +430,7 @@ ISVTEC
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
 								'Passwords do not match');
 
-		$email = strtolower(mysql_escape_string($email));
+		$email = strtolower(mysql_real_escape_string($email));
 
 		if($email == 'demo@isvtec.com')
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
