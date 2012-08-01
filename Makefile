@@ -45,6 +45,8 @@ install:
 	mkdir -p $(DESTDIR)/usr/share/cybsso/template
 	cp template/*.phtml $(DESTDIR)/usr/share/cybsso/template
 
+	cp -r test/schema.sql $(DESTDIR)/usr/share/cybsso
+
 	$(MAKE) -C doc install
 
 test:
