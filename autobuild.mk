@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2010 Cyril Bouthors <cyril@bouthors.org>
+# Copyright (C) 2009-2012 Cyril Bouthors <cyril@bouthors.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,20 +22,16 @@ PKG=$(shell awk 'NR == 1 {print $$1}' debian/changelog)
 
 AUTOBUILD_DATE:=$(shell date "+%a, %m %b %Y %H:%M:%S %z")
 AUTOBUILD_PACKAGE:=$(shell awk '/^Package: / {print $$2}' debian/control | head -1)
-AUTOBUILD_VERSION:=$(VERSION).r$(shell svn info | awk '/^Revision: / {print $$2}').$(shell date +%Y%m%d.%H%M)
 AUTOBUILD_DISTRIBUTION=unstable
 AUTOBUILD_DIR=/tmp
 AUTOBUILD_ARCH:=$(shell if grep -Eq '^Architecture: all' debian/control; then echo all; else dpkg --print-architecture; fi)
-
-SVN_SERVER:=svn
-SVN_URL:=$(SVN_SERVER)::$(AUTOBUILD_DISTRIBUTION)
 
 buildclean:
 	rm -rf $(AUTOBUILD_DIR)/$(PKG)* $(AUTOBUILD_DIR)/$(AUTOBUILD_PACKAGE)* $(AUTOBUILD_DIR)/autobuild-$(PKG)*
 
 debuild:
 	rm -rf $(AUTOBUILD_DIR)/$(PKG)-$(VERSION)
-	$(RSYNC) -aC --del . $(AUTOBUILD_DIR)/$(PKG)-$(VERSION)
+	$(RSYNC) -aC --del --exclude .git . $(AUTOBUILD_DIR)/$(PKG)-$(VERSION)
 	tar -C $(AUTOBUILD_DIR) -czf $(AUTOBUILD_DIR)/$(PKG)-$(VERSION).tar.gz $(PKG)-$(VERSION)
 	cp $(AUTOBUILD_DIR)/$(PKG)-$(VERSION).tar.gz $(AUTOBUILD_DIR)/$(PKG)_$(VERSION).orig.tar.gz
 	cd $(AUTOBUILD_DIR)/$(PKG)-$(VERSION) && debuild
@@ -44,13 +40,6 @@ autobuild: $(AUTOBUILD_DIR)/$(AUTOBUILD_PACKAGE)_$(AUTOBUILD_VERSION)-1_$(AUTOBU
 
 $(AUTOBUILD_DIR)/$(AUTOBUILD_PACKAGE)_$(AUTOBUILD_VERSION)-1_$(AUTOBUILD_ARCH).deb:
 	rm -rf $(AUTOBUILD_DIR)/autobuild-$(PKG)-$(AUTOBUILD_VERSION)
-	$(RSYNC) -aC --del . $(AUTOBUILD_DIR)/autobuild-$(PKG)-$(AUTOBUILD_VERSION)
+	$(RSYNC) -aC --del --exclude .git . $(AUTOBUILD_DIR)/autobuild-$(PKG)-$(AUTOBUILD_VERSION)
 	$(MAKE) -C $(AUTOBUILD_DIR)/autobuild-$(PKG)-$(AUTOBUILD_VERSION) increment-changelog-version VERSION=$(AUTOBUILD_VERSION) AUTOBUILD_VERSION=$(AUTOBUILD_VERSION)
 	$(MAKE) -C $(AUTOBUILD_DIR)/autobuild-$(PKG)-$(AUTOBUILD_VERSION) debuild VERSION=$(AUTOBUILD_VERSION) AUTOBUILD_VERSION=$(AUTOBUILD_VERSION)
-
-upload: $(AUTOBUILD_DIR)/$(AUTOBUILD_PACKAGE)_$(AUTOBUILD_VERSION)-1_$(AUTOBUILD_ARCH).deb
-	$(RSYNC) -a --progress $(AUTOBUILD_DIR)/$(AUTOBUILD_PACKAGE)_$(AUTOBUILD_VERSION)-1_$(AUTOBUILD_ARCH).deb $(SVN_URL)
-
-increment-changelog-version:
-	( /bin/echo -e "$(PKG) ("$(VERSION)"-1) $(AUTOBUILD_DISTRIBUTION); urgency=low\n\n  * Autobuild from SVN.\n\n -- Autobuild <cyb@debian.org>  $(AUTOBUILD_DATE)\n"; cat debian/changelog) > debian/changelog.tmp
-	mv debian/changelog.tmp debian/changelog
