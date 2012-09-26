@@ -20,7 +20,7 @@ require('/etc/cybsso/config.php');
 require('cybsso/CybSSO.php');
 
 try {
-	$server = new SoapServer(null, array('uri' => ''));
+	$server = new SoapServer(null, array('uri' => 'ns1'));
 
 	$server->setClass('CybSSO');
 	$server->setPersistence(SOAP_PERSISTENCE_SESSION);

@@ -1,3 +1,10 @@
+cybsso (1.0-15) unstable; urgency=low
+
+  * www/api/index.php: specify an XML namespace instead of an empty string
+    because it's invalid and prevent python-zsi from working.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Wed, 26 Sep 2012 03:28:28 +0200
+
 cybsso (1.0-14) unstable; urgency=low
 
   * Added better logout support.
