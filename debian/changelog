@@ -1,3 +1,11 @@
+cybsso (1.0-16) unstable; urgency=low
+
+  * Revert usage of mysql_real_escape_string() and now use
+    mysql_escape_string() again because it does not require an active SQL
+    connection.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Wed, 26 Sep 2012 03:36:49 +0200
+
 cybsso (1.0-15) unstable; urgency=low
 
   * www/api/index.php: specify an XML namespace instead of an empty string
