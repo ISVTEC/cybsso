@@ -1,3 +1,9 @@
+cybsso (1.0-17) unstable; urgency=low
+
+  * www/self/index.php: redirect to $return_url if parameter is specified.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Thu, 08 Nov 2012 22:50:37 +0100
+
 cybsso (1.0-16) unstable; urgency=low
 
   * Revert usage of mysql_real_escape_string() and now use

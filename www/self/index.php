@@ -16,7 +16,6 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 require('/etc/cybsso/config.php');
 require('cybsso/CybSSOPrivate.php');
 
@@ -65,6 +64,12 @@ if(isset($_POST['action']) and $_POST['action']=='Update') {
     $cybsso = new CybSSOPrivate;
     $cybsso->UserUpdate($_POST);
     $_SESSION['user'] = $cybsso->UserGetInfo($_SESSION['user']['email']);
+
+    if(isset($_POST['return_url'])) {
+      header('Location: ' . $_POST['return_url']);
+      exit;
+    }
+
   }
   catch(SoapFault $fault) {
     $message = $fault->getMessage();
@@ -97,7 +102,8 @@ $form = sprintf(
   isset($_SESSION['user']['firstname'])?$_SESSION['user']['firstname']:'',
   isset($_SESSION['user']['lastname'])?$_SESSION['user']['lastname']:'',
   isset($_SESSION['user']['email'])?$_SESSION['user']['email']:'',
-  $html
+  $html,
+  isset($_GET['return_url'])?$_GET['return_url']:''
 );
 
 $page =  sprintf(
