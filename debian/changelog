@@ -1,3 +1,9 @@
+cybsso (1.0-18) unstable; urgency=low
+
+  * template/login.phtml: hide password.
+
+ -- Cyril Bouthors <cyril@bouthors.org>  Fri, 09 Nov 2012 17:13:13 +0100
+
 cybsso (1.0-17) unstable; urgency=low
 
   * www/self/index.php: redirect to $return_url if parameter is specified.
