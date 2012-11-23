@@ -65,7 +65,7 @@ if(isset($_POST['action']) and $_POST['action']=='Update') {
     $cybsso->UserUpdate($_POST);
     $_SESSION['user'] = $cybsso->UserGetInfo($_SESSION['user']['email']);
 
-    if(isset($_POST['return_url'])) {
+    if(!empty($_POST['return_url'])) {
       header('Location: ' . $_POST['return_url']);
       exit;
     }
