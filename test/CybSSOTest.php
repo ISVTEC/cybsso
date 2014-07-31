@@ -280,7 +280,7 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 											   $user['email'],
 											   $user['password']);
 
-		$this->assertType('array', $ticket);
+		$this->assertInternalType('array', $ticket);
 		$this->assertArrayHasKey('name', $ticket);
 		$this->assertArrayHasKey('expiration', $ticket);
 	}
