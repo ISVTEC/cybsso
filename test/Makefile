@@ -17,12 +17,10 @@
 test: all;
 
 all: clean
-	@if [ "$$UID" = 0 ]; then echo ERROR: The unit tests are not working if you run them as root because the read-only file checks are bypassed; exit 1; fi
+	@if [ "$$UID" = 0 ]; then echo 'ERROR: The unit tests are not working if you run them as root because the read-only file checks are bypassed'; exit 1; fi
 	phpunit --configuration config.xml --coverage-html report CybSSOTest.php
-	@echo Code coverage: $$(head -76 report/*CybSSO.php.html | tail -1 | cut -d\" -f10)
-	@echo Report is here: file://$$PWD/report/CybSSO.php.html
-#	Error if != 100% coverage
-	@head -76 report/CybSSO.php.html | tail -1 | cut -d\" -f10 | grep -q '100.00%'
+	@echo "Report is here: file://$$PWD/report/index.html"
+	@./assert-code-coverage-level report/CybSSO.php.html
 
 clean:
 	@rm -rf report
