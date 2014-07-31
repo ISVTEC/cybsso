@@ -326,12 +326,20 @@ class CybSSO {
 			throw new SoapFault(__CLASS__ .'->'. __FUNCTION__.'()',
 								'Unable to update demo user information');
 
+                $password_update = '';
+                if(isset($user['password']))
+                {
+                  $crypt_password = mysql_escape_string(sha1($user['password']));
+                  $password_update = ", crypt_password  = '$crypt_password'";
+                }
+
 		$result = $this->_SQLQuery(
    			'UPDATE user '.
    			'SET ' .
 			"    firstname = '$user[firstname]', ".
 			"    lastname  = '$user[lastname]', ".
 			"    language  = '$user[language]' ".
+			"    $password_update ".
 			"WHERE   email = '$user[email]' " .
 			'LIMIT 1');
 	}

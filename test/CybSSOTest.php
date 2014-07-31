@@ -382,6 +382,44 @@ class CybSSOTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($user_update['language'],  $user['language']);
 	}
 
+	function testUserUpdateChangePassword() {
+		$user_create = array(
+			'email'     => 'user@company.com',
+			'password'  => 'valid-password',
+			'firstname' => 'initial first name',
+			'lastname'  => 'initial last name',
+			'language'  => 'en_US',
+		);
+
+		$this->_UserCreate->invoke($this->CybSSO, $user_create);
+
+                $crypt_password = sha1($user_create['password']);
+
+                $res = mysql_query("SELECT email
+                             FROM user
+                             WHERE email = '$user_create[email]'
+                               AND crypt_password = '$crypt_password'")
+                  or die(mysql_error());
+
+                $this->assertEquals(1, mysql_num_rows($res));
+
+
+		$user_update = $user_create;
+                $user_update['password'] = 'new-password';
+
+		$this->_UserUpdate->invoke($this->CybSSO, $user_update);
+
+                $crypt_password = sha1($user_update['password']);
+
+                $res = mysql_query("SELECT email
+                             FROM user
+                             WHERE email = '$user_update[email]'
+                               AND crypt_password = '$crypt_password'")
+                  or die(mysql_error());
+
+                $this->assertEquals(1, mysql_num_rows($res));
+	}
+
 	function testPasswordRecoveryFailedLoggedAsDemo() {
 		$this->setExpectedException('SoapFault');
 		$this->_PasswordRecovery->invoke($this->CybSSO, 'demo@isvtec.com');
