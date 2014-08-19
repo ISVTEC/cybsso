@@ -26,8 +26,8 @@ class CybSSO {
 
 	private $_db = false;
 	private $_ticket_validity = 86400;
-	private $_email_sender_name = 'Exploitation ISVTEC';
-	private $_email_sender_address = 'exploitation@isvtec.com';
+	private $_email_sender_name = 'Suppor ISVTEC';
+	private $_email_sender_address = 'support@isvtec.com';
 
 	private $_url = 'https://login.isvtec.com/';
 
