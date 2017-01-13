@@ -125,7 +125,7 @@ class CybSSO {
 	 *
 	 * @return expiration int. The expiration date of the ticket in a UNIX
 	 * timestamp format.
-	 * 
+	 *
 	 * The method will throw an exception if the ticket is invalid.
 	 */
 	function TicketCheck($ticket = null, $email = null) {
@@ -159,7 +159,7 @@ class CybSSO {
 	 * @param $email string. The user email address.
 	 *
 	 * @param password string. The user password.
-	 * 
+	 *
 	 * @return ticket_info array. An array contaning information about the
 	 * ticket, for example:
 	 *
@@ -167,7 +167,7 @@ class CybSSO {
 	 * 	'name'       => '4b09dc55b89862439d3c1c68e544a98c3962c7a7619051e43df8a',
 	 * 	'expiration' => 1308376031,
 	 * );
-	 * 
+	 *
 	 * 'ticket' contains the ticket name.
 	 *
 	 * expiration contains the expiration date of the ticket in a UNIX timestamp
@@ -177,7 +177,7 @@ class CybSSO {
 		CybPHP_Validate::ValidateEmail($email);
 		CybPHP_Validate::ValidatePassword($password);
 		$this->_ValidateUserExists($email);
-		
+
 		$email = strtolower(mysql_escape_string($email));
 
 		# Crypt password
@@ -211,7 +211,7 @@ class CybSSO {
 		);
 	}
 
-	
+
 	/**
 	 * Delete new ticket
 	 *
@@ -224,7 +224,7 @@ class CybSSO {
 		# Avoid demo user to delete the ticket
 		if($email == 'demo@isvtec.com')
 			return;
-		
+
 		$this->_SQLQuery(
 			'UPDATE user '.
 			'SET ticket_expiration_date = 0 '.
