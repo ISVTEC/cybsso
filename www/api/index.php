@@ -20,11 +20,12 @@ require('/etc/cybsso/config.php');
 require('cybsso/CybSSO.php');
 
 try {
+	$data = file_get_contents('php://input');
 	$server = new SoapServer(null, array('uri' => 'ns1'));
 
 	$server->setClass('CybSSO');
 	$server->setPersistence(SOAP_PERSISTENCE_SESSION);
-	$server->handle();
+	$server->handle($data);
 }
 catch(SoapFault $fault) {
 }
