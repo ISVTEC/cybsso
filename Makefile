@@ -17,7 +17,10 @@
 
 DESTDIR=/usr/local
 
-all: test doc;
+all:
+	@if [ $$(phpunit --version|head -1| cut -c9-9) -lt 5 ]; then echo "Requires PHPUnit 5 or greater (https://phpunit.de/getting-started/phpunit-5.html)"; exit 1; fi;
+	$(MAKE) -C test
+	$(MAKE) -C doc
 
 include autobuild.mk
 
