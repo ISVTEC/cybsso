@@ -1,3 +1,22 @@
+cybsso (1.0-24) unstable; urgency=medium
+
+  [ Cyril Bouthors ]
+  * Remove whitespaces
+  * Fixed typo in Email sender
+  * Create README.md
+
+  [ Stephane Dujardin ]
+  * Force POST via php://input to avoid deprecated warning https://trello.com/c/4YTHpb94/203-cybapi-fix-httprawpostdata
+
+  [ Stéphane Dujardin ]
+  * Add code coverage support for phpunit 4 & 5
+  * Check PHPUnit version in Makefile
+
+  [ Cyril Bouthors ]
+  * Disabled PDF documentation creation and removed LaTeX dependency
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Mon, 02 Dec 2019 10:55:35 +0000
+
 cybsso (1.0-23) unstable; urgency=medium
 
   * lib/CybSSO.php, lib/CybSSOPrivate.php: new email address.
