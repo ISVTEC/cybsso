@@ -51,10 +51,19 @@ case "$phpunit_version" in
     coverage_percentage=$(awk -F\" '/coverBarOutline/ {print $4; exit}' \
 	$report_file)
     ;;
-    *)
-        coverage_percentage=$(grep -A3 Total $report_file \
-                                     | awk '/sr-only/ {print $2}' | cut -d\> -f2)
+
+    '4.2')
+	coverage_percentage=$(grep -A3 Total $report_file \
+				     | awk '/sr-only/ {print $2}' | cut -d\> -f2)
     ;;
+
+    '5.1'|'5.4')
+    coverage_percentage=$(head -46 $report_file |tail -1 | cut -d\" -f6)%
+    ;;
+
+    *)
+	echo "$0: unknown PHPUnit version $phpunit_version" >&2
+	exit 1
 esac
 
 echo "Coverage report: $coverage_percentage"
