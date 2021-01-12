@@ -189,7 +189,6 @@ div.quick-summary-right	{ width: 49%; padding: 2px; text-align: right; float: ri
 
 /* entete rouge avec logo et menu */
 .header {
-	background: url(/templates/isvtec/images/homepage-02.gif) repeat;
 	text-decoration: none;
 	font-weight: normal;
 	width:100%;
@@ -206,12 +205,11 @@ div.quick-summary-right	{ width: 49%; padding: 2px; text-align: right; float: ri
 	margin-left: 10px;
 	padding-right: 10px;
 	padding-left: 10px;
-	background: url(/templates/isvtec/images/homepage-08.gif) no-repeat 0 3px;
 }
 
 a.mainlevel:hover{
 	text-decoration: underline;
-	color: #FFFFFF;		
+	color: #FFFFFF;
 }
 
 .mainlevelsub, a.mainlevelsub, a.mainlevelsub:active, a.mainlevelsub:visited {
@@ -235,21 +233,21 @@ a.mainlevelsub:hover{
 
 
 /* premier footer : bloc rouge */
-#first_footer { 
-	width:100%; 
+#first_footer {
+	width:100%;
 	padding:7px 0px;
 	margin-top:20px;
 	background-color: #991418;
 	text-decoration: none;
-	font-weight: normal;				
+	font-weight: normal;
 	color: #FFFFFF;
 	text-align:center;
 }
 
 /* reprise des styles de joomla pour le footer */
-.mainlevelfooter, 
-a.mainlevelfooter, 
-a.mainlevelfooter:active, 
+.mainlevelfooter,
+a.mainlevelfooter,
+a.mainlevelfooter:active,
 a.mainlevelfooter:visited {
 	color: #FFFFFF;
 	text-decoration: none;
@@ -264,11 +262,11 @@ a.mainlevelfooter:hover{
 }
 
 /* deuxiÃ¨me footer : bloc gris */
-#second_footer { 
+#second_footer {
 	width:100%;
-	padding:0px; 
+	padding:0px;
 	padding-top:8px;
-	text-align:center; 
+	text-align:center;
 	background-color:#D6D7D6;
 }
 /* span de copyright */
@@ -290,7 +288,7 @@ a.mainlevelfooter:hover{
     padding:0px;
     list-style-type:none;
     float:none;
-    
+
 }
 
 .tabs li {
@@ -390,7 +388,7 @@ a.mainlevelfooter:hover{
 
 .primary {
     color:white;
-    background-color:#991418;    
+    background-color:#991418;
  }
 
 .btn-group {
