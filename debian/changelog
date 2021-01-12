@@ -1,3 +1,10 @@
+cybsso (1.0-28) unstable; urgency=medium
+
+  * doc/Makefile: keep local documentation only
+  * doc/Makefile: fixed copyright
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Tue, 12 Jan 2021 15:30:34 +0000
+
 cybsso (1.0-27) unstable; urgency=medium
 
   * debian/control: add build-dep to doxygen
