@@ -1,3 +1,9 @@
+cybsso (1.0-29) unstable; urgency=medium
+
+  * debian/control: add dependency on php5-xdebug OR php-xdebug
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Tue, 12 Jan 2021 15:36:39 +0000
+
 cybsso (1.0-28) unstable; urgency=medium
 
   * doc/Makefile: keep local documentation only
