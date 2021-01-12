@@ -1,3 +1,19 @@
+cybsso (1.0-25) unstable; urgency=medium
+
+  [ Stephane Dujardin ]
+  * Force POST via php://input to avoid deprecated warning https://trello.com/c/4YTHpb94/203-cybapi-fix-httprawpostdata
+
+  [ Cyril Bouthors ]
+  * test/assert-code-coverage-level: add support for PHPUnit 4.2, 5.1, 5.4
+  * assert-code-coverage-level: add support for PHPUnit 7.5
+  * test/Makefile: clean
+
+  [ Stéphane Dujardin ]
+  * Remove missing image to avoid 404
+  * Use same links as www.isvtec.com header
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Tue, 12 Jan 2021 15:10:23 +0000
+
 cybsso (1.0-24) unstable; urgency=medium
 
   [ Cyril Bouthors ]
