@@ -16,7 +16,6 @@
 
 DESTDIR=/usr/local
 RSYNC=rsync -avz --del
-url=cybtools.isvtec.com/cybsso
 
 ALL= html/index.html
 
@@ -27,10 +26,6 @@ html/index.html: ../lib/CybSSO.php
 
 clean:
 	rm -rf html
-
-upload: all
-	$(RSYNC) html/ cybtools.isvtec.com:/var/www/$(url)
-	@echo Documentation is up-to-date at http://$(url)/
 
 install: all
 	mkdir -p $(DESTDIR)/usr/share/doc/cybsso
