@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Cyril Bouthors <cyb@debian.org>
 Uploaders: Cyril Bouthors <cyril@bouthors.org>
-Build-Depends: debhelper (>= 5), phpunit, php5-xdebug, doxygen
+Build-Depends: debhelper (>= 5), phpunit, php5-xdebug | php-xdebug, doxygen
 Standards-Version: 3.9.1
 
 Package: cybsso
