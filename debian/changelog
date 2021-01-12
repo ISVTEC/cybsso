@@ -1,3 +1,10 @@
+cybsso (1.0-26) unstable; urgency=medium
+
+  * Makefile: fixed copyright
+  * Makefile: temporarily disabled unit tests, project is soon deprecated
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Tue, 12 Jan 2021 15:23:50 +0000
+
 cybsso (1.0-25) unstable; urgency=medium
 
   [ Stephane Dujardin ]
