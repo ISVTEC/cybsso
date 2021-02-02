@@ -1,3 +1,10 @@
+cybsso (1.0-30) unstable; urgency=medium
+
+  [ Stéphane Dujardin ]
+  * Fix php5-mysql|php-mysql dependency
+
+ -- Cyril Bouthors <cyril@boutho.rs>  Tue, 02 Feb 2021 13:00:40 +0000
+
 cybsso (1.0-29) unstable; urgency=medium
 
   * debian/control: add dependency on php5-xdebug OR php-xdebug
