@@ -1,13 +1,12 @@
 <?php
 
-require('sso.php');
+require('cybsso.php');
 
 echo "User successfully connected: " .
 $_SESSION[cybsso_user][firstname] . ' ' .
 $_SESSION[cybsso_user][lastname] . ' ' .
 $_SESSION[cybsso_user][email]. ' ' .
-$_SESSION[cybsso_user][language]."
-";
+$_SESSION[cybsso_user][language];
 
 ?>
 
