@@ -14,7 +14,7 @@ try
     'location' => CYBSSO_URL . 'api/',
     'login'    => 'api-login',
     'password' => 'api-password',
-    'uri'      => '',
+    'uri'      => 'ns1',
   ));
 
   $return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
