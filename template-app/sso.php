@@ -2,20 +2,21 @@
 
 session_start();
 
+require('config.php');
+
 try
 {
-  // Connect to the SSO API
-  define('CYBSSO_URL', 'https://login.isvtec.com/');
 
-  // Create a new login and password:
-  // htpasswd -m -b /etc/cybsso/htpasswd api-login api-password
+// Connect to the SSO API
 
-  $cybsso = new SoapClient(null, array(
-    'location' => CYBSSO_URL . 'api/',
-    'login'    => 'api-login',
-    'password' => 'api-password',
-    'uri'      => 'ns1',
-  ));
+  $cybsso = new SoapClient(null, array
+    (
+      'location' => CYBSSO_URL . 'api/',
+      'login'    => CYBSSO_LOGIN,
+      'password' => CYBSSO_PASSWORD,
+      'uri'      => 'ns1',
+    )
+  );
 
   $return_url = (($_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://') .
   $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -39,7 +40,8 @@ try
 
     $cybsso_user = $cybsso->UserGetInfo($_GET['cybsso_email']);
 
-    $_SESSION = array(
+    $_SESSION = array
+    (
       'cybsso_ticket'                 => $_GET['cybsso_ticket'],
       'cybsso_ticket_expiration_date' => $expiration,
       'cybsso_user'                   => $cybsso_user,
