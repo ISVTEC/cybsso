@@ -71,7 +71,7 @@ catch(SoapFault $fault)
   exit;
 }
 
-echo '<pre>';
+echo 'User successfully connected:<pre>';
 print_r($_SESSION['cybsso_user']);
 ?>
 </pre>
